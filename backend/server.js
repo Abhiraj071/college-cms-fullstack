@@ -1,4 +1,5 @@
 const express = require('express');
+const compression = require('compression');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -17,8 +18,9 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Middleware
+app.use(compression());
 app.use(cors());
-app.use(express.json()); // Restore JSON parser
+app.use(express.json());
 
 // Serve static uploads
 
@@ -43,11 +45,15 @@ app.use('/api/assignments', require('./routes/assignmentRoutes'));
 app.use('/api/study-materials', require('./routes/studyMaterialRoutes'));
 
 // Serve Frontend Static Files
-app.use(express.static(path.join(__dirname, '../')));
+const root = path.join(__dirname, '../');
+app.use(express.static(root, {
+    maxAge: '1d',
+    index: false
+}));
 
 // SPA Catch-all: Redirect all non-API requests to index.html
 app.get(/^(?!\/api).+/, (req, res) => {
-    res.sendFile(path.join(__dirname, '../index.html'));
+    res.sendFile(path.join(root, 'index.html'));
 });
 
 
