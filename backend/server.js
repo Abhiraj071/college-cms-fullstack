@@ -60,8 +60,32 @@ app.get(/^(?!\/api).+/, (req, res) => {
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/college_cms';
 mongoose.connect(MONGODB_URI)
-    .then(() => console.log('✅ Connected to MongoDB'))
+    .then(async () => {
+        console.log('✅ Connected to MongoDB');
+        await initializeAdmin();
+    })
     .catch(err => console.error('❌ MongoDB connection error:', err));
+
+async function initializeAdmin() {
+    try {
+        const User = require('./models/User');
+        const adminExists = await User.findOne({ username: 'admin' });
+        
+        if (!adminExists) {
+            const adminUser = new User({
+                username: 'admin',
+                password: 'admin123',
+                name: 'System Administrator',
+                email: 'admin@college.edu',
+                role: 'admin'
+            });
+            await adminUser.save();
+            console.log('🎁 Production: Admin user created automatically (admin/admin123)');
+        }
+    } catch (err) {
+        console.error('⚠️ Admin initialization failed:', err.message);
+    }
+}
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
