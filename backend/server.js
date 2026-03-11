@@ -69,19 +69,25 @@ mongoose.connect(MONGODB_URI)
 async function initializeAdmin() {
     try {
         const User = require('./models/User');
-        const adminExists = await User.findOne({ username: 'admin' });
+        let adminUser = await User.findOne({ username: 'admin' });
         
-        if (!adminExists) {
-            const adminUser = new User({
+        if (!adminUser) {
+            adminUser = new User({
                 username: 'admin',
-                password: 'admin123',
                 name: 'System Administrator',
                 email: 'admin@college.edu',
                 role: 'admin'
             });
-            await adminUser.save();
-            console.log('🎁 Production: Admin user created automatically (admin/admin123)');
+            console.log('🎁 Production: Creating new Admin user...');
+        } else {
+            console.log('🔄 Production: Updating existing Admin password...');
         }
+
+        // Force set the password
+        adminUser.password = 'admin123';
+        await adminUser.save();
+        console.log('✅ Admin login ready: admin / admin123');
+
     } catch (err) {
         console.error('⚠️ Admin initialization failed:', err.message);
     }

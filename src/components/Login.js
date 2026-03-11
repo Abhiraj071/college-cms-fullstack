@@ -37,7 +37,7 @@ export class Login {
             <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
                 <p style="font-size: 0.8rem; color: var(--text-secondary);">Demo Credentials:</p>
                 <div style="display: flex; gap: 10px; justify-content: center; margin-top: 0.5rem; font-size: 0.8rem; color: var(--accent-color);">
-                    <span>admin/password</span>
+                    <span>admin/admin123</span>
                     <span>student/password</span>
                 </div>
             </div>
