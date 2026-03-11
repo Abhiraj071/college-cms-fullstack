@@ -45,12 +45,9 @@ app.use('/api/study-materials', require('./routes/studyMaterialRoutes'));
 // Serve Frontend Static Files
 app.use(express.static(path.join(__dirname, '../')));
 
-// SPA Catch-all: Redirect all other requests to index.html
-app.get('*', (req, res) => {
-    // If not an API route, serve the frontend
-    if (!req.path.startsWith('/api/')) {
-        res.sendFile(path.join(__dirname, '../index.html'));
-    }
+// SPA Catch-all: Redirect all non-API requests to index.html
+app.get(/^(?!\/api).+/, (req, res) => {
+    res.sendFile(path.join(__dirname, '../index.html'));
 });
 
 
