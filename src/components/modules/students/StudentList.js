@@ -20,238 +20,206 @@ export class StudentList {
         const header = document.createElement('div');
         header.style.display = 'flex';
         header.style.justifyContent = 'space-between';
-        header.style.alignItems = 'center';
+        header.style.alignItems = 'flex-end';
         header.style.gap = '2rem';
         header.style.flexWrap = 'wrap';
-        header.style.marginBottom = '2rem';
+        header.style.marginBottom = '2.5rem';
 
-        const title = document.createElement('h2');
-        title.textContent = 'Students';
-        title.style.margin = '0';
-        title.style.marginRight = '2rem';
-        title.style.minWidth = 'fit-content';
-
-        const layoutGroup = document.createElement('div');
-        layoutGroup.style.display = 'flex';
-        layoutGroup.style.gap = '1.5rem';
-        layoutGroup.style.alignItems = 'center';
-        layoutGroup.style.flexWrap = 'wrap';
-
-        const filterGroup = document.createElement('div');
-        filterGroup.style.display = 'flex';
-        filterGroup.style.gap = '1rem';
-        filterGroup.style.background = 'rgba(255,255,255,0.05)';
-        filterGroup.style.padding = '4px';
-        filterGroup.style.borderRadius = '8px';
-
-        const createSelect = (placeholder) => {
-            const select = document.createElement('select');
-            select.style.padding = '0.5rem';
-            select.style.borderRadius = '6px';
-            select.style.border = 'none';
-            select.style.background = 'transparent';
-            select.style.color = 'var(--text-primary)';
-            select.style.cursor = 'pointer';
-            select.innerHTML = `<option value="">${placeholder}</option>`;
-            return select;
-        };
-
-        // 1. Course Filter
-        const courseSelect = createSelect('Select Course');
-
-        // 2. Year Filter
-        const yearSelect = createSelect('Select Course First');
-        yearSelect.disabled = true;
-
-        // 3. Semester Filter
-        const semesterSelect = createSelect('Select Year First');
-        semesterSelect.disabled = true;
-
-        filterGroup.appendChild(courseSelect);
-        filterGroup.appendChild(yearSelect);
-        filterGroup.appendChild(semesterSelect);
-
-        // 3. Add New Student Button
-        const addBtn = document.createElement('button');
-        addBtn.className = 'glass-button';
-        addBtn.innerHTML = '<span style="font-size:1.2rem; vertical-align: middle;">+</span> Add Student';
-        addBtn.style.padding = '8px 20px';
-        addBtn.onclick = () => { window.location.hash = ROUTES.STUDENTS_ADD; };
-        if (user.role !== 'admin') addBtn.style.display = 'none';
-
-        const bulkAddBtn = document.createElement('button');
-        bulkAddBtn.className = 'glass-button';
-        bulkAddBtn.style.background = 'rgba(255, 255, 255, 0.05)';
-        bulkAddBtn.style.color = 'var(--text-primary)';
-        bulkAddBtn.innerHTML = 'Import CSV/Excel';
-        bulkAddBtn.style.padding = '8px 20px';
-        bulkAddBtn.onclick = () => { window.location.hash = ROUTES.STUDENTS_BULK; };
-        if (user.role !== 'admin') bulkAddBtn.style.display = 'none';
-
-        layoutGroup.appendChild(filterGroup);
-        layoutGroup.appendChild(bulkAddBtn);
-        layoutGroup.appendChild(addBtn);
-
-        header.appendChild(title);
-        header.appendChild(layoutGroup);
-        container.appendChild(header);
-
-        // Main Content Area (Table)
-        const tableCard = document.createElement('div');
-        tableCard.className = 'glass-panel';
-        tableCard.style.padding = '1rem';
-        tableCard.style.minHeight = '200px';
-
-        // Initial State
-        tableCard.innerHTML = `
-            <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">🎓</div>
-                <p>Please select a <strong>Course</strong>, <strong>Year</strong> and <strong>Semester</strong>.</p>
+        const titleSection = document.createElement('div');
+        titleSection.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 0.5rem;">
+                <span style="font-size: 2rem;">👨‍🎓</span>
+                <h2 style="font-size: 2rem; margin: 0; letter-spacing: -1px;">Students</h2>
             </div>
+            <p style="color: var(--text-secondary); font-size: 1rem; font-weight: 500;">Manage student profiles, enrollment, and academic status.</p>
         `;
 
-        // Filter Logic
+        const actionGroup = document.createElement('div');
+        actionGroup.style.display = 'flex';
+        actionGroup.style.gap = '1rem';
+        actionGroup.style.alignItems = 'center';
+
+        if (user.role === 'admin') {
+            const bulkAddBtn = document.createElement('button');
+            bulkAddBtn.className = 'glass-button';
+            bulkAddBtn.style.background = 'var(--bg-secondary)';
+            bulkAddBtn.style.color = 'var(--text-primary)';
+            bulkAddBtn.style.borderColor = 'var(--glass-border)';
+            bulkAddBtn.innerHTML = '📤 Bulk Import';
+            bulkAddBtn.onclick = () => { window.location.hash = ROUTES.STUDENTS_BULK; };
+
+            const addBtn = document.createElement('button');
+            addBtn.className = 'glass-button';
+            addBtn.style.background = 'var(--accent-color)';
+            addBtn.style.color = 'white';
+            addBtn.style.border = 'none';
+            addBtn.style.padding = '10px 24px';
+            addBtn.style.fontWeight = '700';
+            addBtn.innerHTML = '➕ Add Student';
+            addBtn.onclick = () => { window.location.hash = ROUTES.STUDENTS_ADD; };
+
+            actionGroup.appendChild(bulkAddBtn);
+            actionGroup.appendChild(addBtn);
+        }
+
+        header.appendChild(titleSection);
+        header.appendChild(actionGroup);
+        container.appendChild(header);
+
+        // Filter Bar
+        const filterBar = document.createElement('div');
+        filterBar.className = 'glass-panel';
+        filterBar.style.padding = '1rem';
+        filterBar.style.marginBottom = '2rem';
+        filterBar.style.display = 'flex';
+        filterBar.style.gap = '1rem';
+        filterBar.style.alignItems = 'center';
+        filterBar.style.flexWrap = 'wrap';
+        filterBar.style.background = 'var(--bg-secondary)';
+
+        filterBar.innerHTML = `
+            <div style="min-width: 200px; flex: 1;">
+                <label style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">Academic Program</label>
+                <select id="courseFilter" style="width: 100%;"></select>
+            </div>
+            <div style="min-width: 120px;">
+                <label style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">Year</label>
+                <select id="yearFilter" style="width: 100%;" disabled><option value="">--</option></select>
+            </div>
+            <div style="min-width: 150px;">
+                <label style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">Semester</label>
+                <select id="semesterFilter" style="width: 100%;" disabled><option value="">--</option></select>
+            </div>
+            <div style="display: flex; align-items: flex-end; height: 100%; padding-top: 1.2rem;">
+                <button id="resetFilters" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size: 0.8rem; font-weight: 600; text-decoration: underline;">Reset Filters</button>
+            </div>
+        `;
+        container.appendChild(filterBar);
+
+        const tableCard = document.createElement('div');
+        tableCard.className = 'glass-panel';
+        tableCard.style.padding = '0';
+        tableCard.style.minHeight = '300px';
+        tableCard.style.overflow = 'hidden';
+
+        const renderEmptyState = (msg = 'Please select a course and year to view students.') => {
+            tableCard.innerHTML = `
+                <div style="text-align: center; padding: 6rem 2rem; color: var(--text-secondary);">
+                    <div style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.2;">🎓</div>
+                    <h3 style="opacity: 0.6; margin-bottom: 0.5rem;">No Selection</h3>
+                    <p style="font-size: 0.95rem; max-width: 300px; margin: 0 auto; line-height: 1.5;">${msg}</p>
+                </div>
+            `;
+        };
+        renderEmptyState();
+
+        const courseSelect = filterBar.querySelector('#courseFilter');
+        const yearSelect = filterBar.querySelector('#yearFilter');
+        const semesterSelect = filterBar.querySelector('#semesterFilter');
+
         const updateYears = (courseName) => {
             const course = this.courses.find(c => c.name === courseName);
-            yearSelect.innerHTML = '<option value="">Select Year</option>';
-            semesterSelect.innerHTML = '<option value="">Select Year First</option>';
+            yearSelect.innerHTML = '<option value="">All Years</option>';
+            semesterSelect.innerHTML = '<option value="">--</option>';
             semesterSelect.disabled = true;
-            yearSelect.value = "";
-            semesterSelect.value = "";
-
             if (course) {
                 yearSelect.disabled = false;
-                const duration = course.duration || 4;
-                for (let i = 1; i <= duration; i++) {
+                for (let i = 1; i <= (course.duration || 4); i++) {
                     const opt = document.createElement('option');
                     opt.value = String(i);
                     opt.textContent = `Year ${i}`;
                     yearSelect.appendChild(opt);
                 }
-            } else {
-                yearSelect.disabled = true;
-                yearSelect.innerHTML = '<option value="">Select Course First</option>';
-            }
+            } else { yearSelect.disabled = true; }
             loadStudents();
         };
 
         const updateSemesters = (year) => {
             semesterSelect.innerHTML = '<option value="">All Semesters</option>';
-            semesterSelect.value = "";
-
             if (year) {
                 semesterSelect.disabled = false;
                 const y = parseInt(year);
-                const startSem = (y - 1) * 2 + 1;
-                const endSem = startSem + 1;
-
-                [startSem, endSem].forEach(sem => {
+                [ (y-1)*2+1, (y-1)*2+2 ].forEach(sem => {
                     const opt = document.createElement('option');
                     opt.value = String(sem);
                     opt.textContent = `Semester ${sem}`;
                     semesterSelect.appendChild(opt);
                 });
-            } else {
-                semesterSelect.disabled = true;
-                semesterSelect.innerHTML = '<option value="">Select Year First</option>';
-            }
+            } else { semesterSelect.disabled = true; }
             loadStudents();
         };
 
-        const loadCourseData = async () => {
-            try {
-                this.courses = await ApiService.getCourses();
-                courseSelect.innerHTML = `<option value="">Select Course</option>` +
-                    this.courses.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-            } catch (err) {
-                Toast.error('Failed to load courses');
-            }
-        };
-
         const loadStudents = async () => {
-            const selectedCourse = courseSelect.value;
-            const selectedYear = parseInt(yearSelect.value);
-            const selectedSemester = parseInt(semesterSelect.value);
+            const course = courseSelect.value;
+            const year = parseInt(yearSelect.value);
+            const semester = parseInt(semesterSelect.value);
 
-            if (!selectedCourse || !selectedYear) {
-                tableCard.innerHTML = `
-                    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🎓</div>
-                        <p>Please select a <strong>Course</strong> and <strong>Year</strong>.</p>
-                    </div>
-                `;
+            if (!course) {
+                renderEmptyState('Please choose an academic program to start.');
                 return;
             }
 
-            tableCard.innerHTML = '<div style="padding: 2rem; text-align: center;">Loading students...</div>';
+            tableCard.innerHTML = `
+                <div style="padding: 5rem; text-align: center;">
+                    <div class="loader-spinner" style="width: 40px; height: 40px; border: 4px solid var(--accent-glow); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1.5rem;"></div>
+                    <p style="color: var(--text-secondary); font-weight: 500;">Reading student records...</p>
+                </div>
+            `;
 
             try {
-                // Fetch from Backend
-                const allStudents = await ApiService.getStudents();
-
-                const filtered = allStudents.filter(s => {
-                    if (s.course !== selectedCourse) return false;
-
-                    // Filter by Semester if selected, otherwise by Year
-                    if (selectedSemester) {
-                        return s.semester === selectedSemester;
-                    } else {
-                        const startSem = (selectedYear * 2) - 1;
-                        const endSem = selectedYear * 2;
-                        return s.semester === startSem || s.semester === endSem;
-                    }
+                const all = await ApiService.getStudents();
+                const filtered = all.filter(s => {
+                    if (s.course !== course) return false;
+                    if (semester) return s.semester === semester;
+                    if (year) return (s.semester === (year*2)-1 || s.semester === (year*2));
+                    return true;
                 });
 
                 tableCard.innerHTML = '';
-
                 if (filtered.length === 0) {
-                    tableCard.innerHTML = `
-                        <div style="text-align: center; padding: 2rem;">
-                            <p>No students found.</p>
-                        </div>
-                    `;
+                    renderEmptyState('No students found matching the selected criteria.');
                     return;
                 }
 
                 const table = new Table({
                     columns: [
-                        { key: 'rollNo', label: 'Roll No' },
-                        { key: 'name', label: 'Name', render: (val, item) => `<strong>${val}</strong><br><span style="font-size:0.75rem; color:var(--text-secondary)">${item.userId?.username || 'no-login'}</span>` },
-                        { key: 'course', label: 'Course' },
-                        { key: 'semester', label: 'Sem', render: (val) => `<span style="padding: 2px 8px; background: rgba(255,255,255,0.1); border-radius: 10px; font-size: 0.8rem;">${val}</span>` }
+                        { key: 'rollNo', label: 'Roll No', render: (v) => `<code style="font-weight: 700; color: var(--text-secondary);">${v}</code>` },
+                        { key: 'name', label: 'Full identity', render: (v, item) => `
+                            <div>
+                                <div style="font-weight: 800; color: var(--text-primary); font-size: 0.95rem;">${v}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">@${item.userId?.username || 'unassigned'}</div>
+                            </div>` 
+                        },
+                        { key: 'course', label: 'Program' },
+                        { key: 'semester', label: 'Session', render: (v) => `<span style="padding: 4px 10px; background: var(--bg-primary); border: 1px solid var(--glass-border); border-radius: 20px; font-size: 0.75rem; font-weight: 700; color: var(--accent-color);">SEM ${v}</span>` }
                     ],
                     data: filtered,
-                    onEdit: user.role !== 'admin' ? null : (id) => {
-                        window.location.hash = ROUTES.STUDENTS_EDIT.replace(':id', id);
-                    },
+                    onEdit: user.role !== 'admin' ? null : (id) => window.location.hash = ROUTES.STUDENTS_EDIT.replace(':id', id),
                     onDelete: user.role !== 'admin' ? null : (id) => {
-                        const student = filtered.find(s => s._id === id);
-                        Modal.confirm('Delete Student?', `Are you sure you want to remove ${student?.name || 'this student'}? This will also delete their academic history and login account.`, async () => {
-                            try {
-                                await ApiService.deleteStudent(id);
-                                loadStudents(); // Refresh
-                                Toast.success('Student record removed.');
-                            } catch (err) {
-                                Toast.error(err.message);
-                            }
+                        const s = filtered.find(x => x._id === id);
+                        Modal.confirm('Permanently Delete Student?', `This will remove ${s?.name || 'the student'} and all associated records forever.`, async () => {
+                            try { await ApiService.deleteStudent(id); loadStudents(); Toast.success('Record purged.'); }
+                            catch (err) { Toast.error(err.message); }
                         });
                     }
                 });
                 tableCard.appendChild(table.render());
-            } catch (err) {
-                Toast.error('Failed to load students: ' + err.message);
-                tableCard.innerHTML = `<p style="color:red; text-align:center; padding:2rem;">Error: ${err.message}</p>`;
-            }
+            } catch (err) { Toast.error('Sync Error: ' + err.message); }
         };
 
-        // Attach Listeners
-        courseSelect.addEventListener('change', () => updateYears(courseSelect.value));
-        yearSelect.addEventListener('change', () => updateSemesters(yearSelect.value));
-        semesterSelect.addEventListener('change', loadStudents);
+        (async () => {
+            try {
+                this.courses = await ApiService.getCourses();
+                courseSelect.innerHTML = `<option value="">Select Program</option>` + this.courses.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            } catch (err) { Toast.error('Load Error'); }
+        })();
 
-        loadCourseData();
+        courseSelect.onchange = () => updateYears(courseSelect.value);
+        yearSelect.onchange = () => updateSemesters(yearSelect.value);
+        semesterSelect.onchange = loadStudents;
+        filterBar.querySelector('#resetFilters').onclick = () => { courseSelect.value = ''; updateYears(''); };
+
         container.appendChild(tableCard);
-
         return container;
     }
 }

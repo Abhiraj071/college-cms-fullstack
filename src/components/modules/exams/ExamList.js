@@ -14,38 +14,58 @@ export class ExamList {
         const container = document.createElement('div');
         container.className = 'fade-in';
         const user = auth.getUser();
+        const isAdmin = user.role === 'admin';
+        const isStudent = user.role === 'student';
 
         // Header Section
         const header = document.createElement('div');
         header.style.display = 'flex';
         header.style.justifyContent = 'space-between';
-        header.style.alignItems = 'center';
-        header.style.marginBottom = '2rem';
+        header.style.alignItems = 'flex-end';
+        header.style.marginBottom = '2.5rem';
+        header.style.flexWrap = 'wrap';
+        header.style.gap = '1.5rem';
 
-        const title = document.createElement('h2');
-        title.textContent = 'Examination Schedules';
-        title.style.margin = '0';
+        const titleSection = document.createElement('div');
+        titleSection.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 0.5rem;">
+                <span style="font-size: 2rem;">📝</span>
+                <h2 style="font-size: 2rem; margin: 0; letter-spacing: -1px;">Examinations</h2>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 1rem; font-weight: 500;">Monitor assessment schedules, eligibility, and academic grading.</p>
+        `;
 
-        const addBtn = document.createElement('button');
-        addBtn.className = 'glass-button';
-        addBtn.textContent = '+ Schedule Exam';
-        addBtn.onclick = () => { window.location.hash = 'exams/schedule'; };
-
-        if (user.role === 'student') {
-            addBtn.style.display = 'none';
+        const actionGroup = document.createElement('div');
+        if (!isStudent) {
+            const addBtn = document.createElement('button');
+            addBtn.className = 'glass-button';
+            addBtn.style.background = 'var(--accent-color)';
+            addBtn.style.color = 'white';
+            addBtn.style.border = 'none';
+            addBtn.style.padding = '10px 24px';
+            addBtn.style.fontWeight = '700';
+            addBtn.textContent = '➕ Schedule New';
+            addBtn.onclick = () => { window.location.hash = ROUTES.EXAMS_ADD; };
+            actionGroup.appendChild(addBtn);
         }
 
-        header.appendChild(title);
-        header.appendChild(addBtn);
+        header.appendChild(titleSection);
+        header.appendChild(actionGroup);
         container.appendChild(header);
 
-        // Table container
         const tableCard = document.createElement('div');
         tableCard.className = 'glass-panel';
-        tableCard.style.padding = '1rem';
+        tableCard.style.padding = '0';
+        tableCard.style.overflow = 'hidden';
+        tableCard.style.minHeight = '300px';
 
         const loadData = async () => {
-            tableCard.innerHTML = '<div style="padding: 2rem; text-align: center;">Loading examination schedules...</div>';
+            tableCard.innerHTML = `
+                <div style="padding: 5rem; text-align: center;">
+                    <div class="loader-spinner" style="width: 40px; height: 40px; border: 4px solid var(--accent-glow); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1.5rem;"></div>
+                    <p style="color: var(--text-secondary); font-weight: 500;">Retrieving evaluation cycles...</p>
+                </div>
+            `;
             try {
                 const [allExams, allTimetables] = await Promise.all([
                     ApiService.getExams(),
@@ -54,15 +74,13 @@ export class ExamList {
 
                 this.exams = allExams;
                 if (user.role === 'teacher') {
-                    // Find my assigned subjects and courses from global timetables
-                    const myAssignments = new Set(); // Stores "Course::Subject"
+                    const myAssignments = new Set();
                     allTimetables.forEach(t => {
                         if (t.grid) {
                             Object.values(t.grid).forEach(slot => {
-                                const isMine = slot.teacher === user.name ||
-                                    (user.facultyId && slot.teacher === String(user.facultyId)) ||
-                                    slot.teacher === user._id;
-                                if (isMine) myAssignments.add(`${t.course}::${slot.subject}`);
+                                if (slot.teacher === user.name || (user.facultyId && slot.teacher === String(user.facultyId)) || slot.teacher === user._id) {
+                                    myAssignments.add(`${t.course}::${slot.subject}`);
+                                }
                             });
                         }
                     });
@@ -70,84 +88,71 @@ export class ExamList {
                 }
 
                 tableCard.innerHTML = '';
+                if (this.exams.length === 0) {
+                    tableCard.innerHTML = `
+                        <div style="text-align: center; padding: 5rem 2rem; border: 1px dashed var(--glass-border); border-radius: 16px;">
+                            <div style="font-size: 3rem; margin-bottom: 1.5rem; opacity: 0.2;">📄</div>
+                            <h3 style="opacity: 0.6;">No Assessments Found</h3>
+                            <p style="color: var(--text-secondary); max-width: 320px; margin: 0 auto;">There are no examination cycles scheduled for your current parameters.</p>
+                        </div>
+                    `;
+                    return;
+                }
 
                 const tableData = this.exams.map(e => ({
                     ...e,
-                    status: new Date(e.date) < new Date() ? 'Completed' : 'Upcoming'
+                    statusText: new Date(e.date) < new Date() ? 'Archived' : 'Active'
                 }));
 
                 const table = new Table({
                     columns: [
-                        { key: 'title', label: 'Exam Title', render: (val) => `<strong>${val}</strong>` },
-                        { key: 'course', label: 'Course' },
-                        { key: 'subject', label: 'Subject' },
-                        { key: 'date', label: 'Date', render: (val) => new Date(val).toLocaleDateString() },
-                        { key: 'totalMarks', label: 'Max Marks' },
-                        {
-                            key: 'status', label: 'Status', render: (val) => {
-                                const color = val === 'Completed' ? '#94a3b8' : '#3b82f6';
-                                const bg = val === 'Completed' ? 'rgba(148, 163, 184, 0.1)' : 'rgba(59, 130, 246, 0.1)';
-                                return `<span style="padding: 4px 12px; background: ${bg}; color: ${color}; border-radius: 12px; font-size: 0.8rem;">${val}</span>`;
-                            }
-                        },
-                        {
-                            key: '_id', label: 'Grading', render: (val, item) => {
-                                if (user.role === 'student') return '-';
-                                return `<button class="glass-button marks-entry-btn" data-id="${val}" style="padding: 4px 10px; font-size: 0.75rem;">Enter Marks</button>`;
-                            }
-                        }
+                        { key: 'title', label: 'Evaluation Title', render: (v) => `<div style="font-weight: 800; color: var(--text-primary);">${v}</div>` },
+                        { key: 'subject', label: 'Subject', render: (v, item) => `<div><div style="font-weight: 700;">${v}</div><div style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 800; text-transform: uppercase;">Prog: ${item.course}</div></div>` },
+                        { key: 'date', label: 'Calendar', render: (v) => `<div style="font-weight: 700;">${new Date(v).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</div>` },
+                        { key: 'totalMarks', label: 'Max', render: (v) => `<code style="font-weight: 800; color: var(--accent-color);">${v}pts</code>` },
+                        { key: 'statusText', label: 'Status', render: (v) => {
+                            const active = v === 'Active';
+                            return `<span style="padding: 4px 10px; background: ${active ? 'var(--accent-glow)' : 'rgba(0,0,0,0.05)'}; border-radius: 20px; font-size: 0.7rem; font-weight: 800; color: ${active ? 'var(--accent-color)' : 'var(--text-secondary)'}; text-transform: uppercase;">${v}</span>`;
+                        }},
+                        { key: '_id', label: 'Actions', render: (v, item) => {
+                            if (isStudent) return '---';
+                            return `<button class="glass-button marks-entry-btn" data-id="${v}" style="padding: 6px 12px; font-size: 0.7rem; font-weight: 700;">📥 Assign Grades</button>`;
+                        }}
                     ],
                     data: tableData,
-                    onEdit: (user.role === 'student') ? null : (id) => {
-                        window.location.hash = ROUTES.EXAMS_EDIT.replace(':id', id);
-                    },
-                    onDelete: (user.role !== 'admin') ? null : (id) => {
-                        const exam = this.exams.find(e => e._id === id);
-                        Modal.confirm('Delete Exam Schedule?', `Are you sure you want to remove the exam for ${exam?.subject || 'this subject'}? All recorded grades will be lost.`, async () => {
-                            try {
-                                await ApiService.deleteExam(id);
-                                loadData();
-                                Toast.success('Exam schedule removed.');
-                            } catch (err) {
-                                Toast.error(err.message);
-                            }
+                    onEdit: isStudent ? null : (id) => window.location.hash = ROUTES.EXAMS_EDIT.replace(':id', id),
+                    onDelete: !isAdmin ? null : (id) => {
+                        const e = this.exams.find(x => x._id === id);
+                        Modal.confirm('Purge Exam Schedule?', `Remove the assessment cycle for ${e?.subject}? This action cleans all associated results.`, async () => {
+                            try { await ApiService.deleteExam(id); loadData(); Toast.success('Purged.'); }
+                            catch (err) { Toast.error(err.message); }
                         });
                     }
                 });
 
                 const tableNode = table.render();
-                tableNode.addEventListener('click', (e) => {
-                    const target = e.target;
-                    if (!(target instanceof HTMLElement)) return;
-
-                    const marksBtn = target.closest('.marks-entry-btn');
-                    if (marksBtn instanceof HTMLElement) {
-                        const id = marksBtn.dataset.id;
-                        if (id) {
-                            window.location.hash = ROUTES.EXAMS_MARKS.replace(':id', id) + `?id=${id}`;
-                        }
+                tableNode.onclick = (e) => {
+                    const btn = e.target.closest('.marks-entry-btn');
+                    if (btn) {
+                        const id = btn.dataset.id;
+                        window.location.hash = ROUTES.EXAMS_MARKS.replace(':id', id) + `?id=${id}`;
                     }
-                });
-
+                };
                 tableCard.appendChild(tableNode);
 
-                if (user.role !== 'student') {
-                    const note = document.createElement('p');
-                    note.style.color = 'var(--text-secondary)';
-                    note.style.fontSize = '0.9rem';
-                    note.style.marginTop = '1rem';
-                    note.innerHTML = '💡 Click the ✏️ Edit icon to <strong>Update Schedule</strong> or "Enter Marks" for results.';
-                    tableCard.appendChild(note);
+                if (!isStudent) {
+                    const tip = document.createElement('div');
+                    tip.style.padding = '1.25rem 2rem';
+                    tip.style.background = 'var(--bg-secondary)';
+                    tip.style.borderTop = '1px solid var(--glass-border)';
+                    tip.innerHTML = `<p style="margin:0; font-size:0.8rem; color:var(--text-secondary); font-weight:600;">💡 Tip: Use the <strong>Assign Grades</strong> button to sync student performances or the pencil icon to modify schedule details.</p>`;
+                    tableCard.appendChild(tip);
                 }
-            } catch (err) {
-                Toast.error('Failed to load exams: ' + err.message);
-                tableCard.innerHTML = `<p style="padding: 2rem; color: red; text-align: center;">Error: ${err.message}</p>`;
-            }
+            } catch (err) { Toast.error('Load Error'); }
         };
 
         loadData();
         container.appendChild(tableCard);
-
         return container;
     }
 }

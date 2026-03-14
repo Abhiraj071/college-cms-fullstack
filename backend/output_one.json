@@ -1,0 +1,21 @@
+[
+  {
+    "_id": "69b2e000d030ccf6a199809a",
+    "subject": "Teacher Guardian",
+    "semester": "4",
+    "course": "Diploma In Computer Science",
+    "date": "2026-01-19T00:00:00.000Z",
+    "year": "2",
+    "__v": 0,
+    "createdAt": "2026-03-12T15:47:12.954Z",
+    "markedBy": "69b1b89608f14ab944a19538",
+    "students": [
+      {
+        "studentId": "69b25ee623e2540b0eab72dd",
+        "status": "Absent",
+        "_id": "69b2e000cc278d680d030be5"
+      }
+    ],
+    "updatedAt": "2026-03-12T15:47:12.954Z"
+  }
+]

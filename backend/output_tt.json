@@ -1,0 +1,202 @@
+{
+  "_id": "69b26f7a8b7ea53b03527d99",
+  "semester": 4,
+  "year": 2,
+  "course": "Diploma In Computer Science",
+  "__v": 0,
+  "createdAt": "2026-03-12T07:47:06.813Z",
+  "days": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ],
+  "grid": {
+    "Monday::09:00 - 10:30": {
+      "subject": "Microprocessor & Interface Lab ",
+      "teacher": "Amit Verma",
+      "room": "01"
+    },
+    "Monday::10:30 - 12:00": {
+      "subject": "Database Management System Lab",
+      "teacher": "Pooja Soni",
+      "room": "01"
+    },
+    "Monday::12:00 - 01:00": {
+      "subject": "Database Management System Lab",
+      "teacher": "Pooja Soni",
+      "room": "01"
+    },
+    "Monday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Monday::01:30 - 03:00": {
+      "subject": "Entrepreneurship ",
+      "teacher": "Shailendra Kharkhate",
+      "room": "06"
+    },
+    "Monday::03:00 - 04:30": {
+      "subject": "Linux And Shell Programming ",
+      "teacher": "Shivam Chauhan ",
+      "room": "06"
+    },
+    "Tuesday::09:00 - 10:30": {
+      "subject": "Computer Network Lab",
+      "teacher": "Mohit Gupta",
+      "room": "01"
+    },
+    "Tuesday::10:30 - 12:00": {
+      "subject": "Linux And Shell  Programming Lab",
+      "teacher": "Shivam Chauhan ",
+      "room": "01"
+    },
+    "Tuesday::12:00 - 01:00": {
+      "subject": "Microprocessor & Interface Lab ",
+      "teacher": "Amit Verma",
+      "room": "01"
+    },
+    "Tuesday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Tuesday::01:30 - 03:00": {
+      "subject": "Microprocessor & Interface ",
+      "teacher": "Amit Verma",
+      "room": "06"
+    },
+    "Tuesday::03:00 - 04:30": {
+      "subject": "Computer Network ",
+      "teacher": "Satyendra",
+      "room": "06"
+    },
+    "Wednesday::09:00 - 10:30": {
+      "subject": "Computer Network Lab",
+      "teacher": "Mohit Gupta",
+      "room": "01"
+    },
+    "Wednesday::10:30 - 12:00": {
+      "subject": "Computer Network Lab",
+      "teacher": "Mohit Gupta",
+      "room": "01"
+    },
+    "Wednesday::12:00 - 01:00": {
+      "subject": "Microprocessor & Interface Lab ",
+      "teacher": "Amit Verma",
+      "room": "01"
+    },
+    "Wednesday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Wednesday::01:30 - 03:00": {
+      "subject": "Microprocessor & Interface ",
+      "teacher": "Amit Verma",
+      "room": "06"
+    },
+    "Wednesday::03:00 - 04:30": {
+      "subject": "Linux And Shell Programming ",
+      "teacher": "Shivam Chauhan ",
+      "room": "06"
+    },
+    "Thursday::09:00 - 10:30": {
+      "subject": "Database Management System Lab",
+      "teacher": "Pooja Soni",
+      "room": "01"
+    },
+    "Thursday::10:30 - 12:00": {
+      "subject": "Database Management System Lab",
+      "teacher": "Pooja Soni",
+      "room": "01"
+    },
+    "Thursday::12:00 - 01:00": {
+      "subject": "Computer Network Lab",
+      "teacher": "Mohit Gupta",
+      "room": "01"
+    },
+    "Thursday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Thursday::01:30 - 03:00": {
+      "subject": "Entrepreneurship ",
+      "teacher": "Shailendra Kharkhate",
+      "room": "06"
+    },
+    "Thursday::03:00 - 04:30": {
+      "subject": "Database Management System ",
+      "teacher": "Pooja Soni",
+      "room": "06"
+    },
+    "Friday::09:00 - 10:30": {
+      "subject": "Database Management System Lab",
+      "teacher": "Pooja Soni",
+      "room": "06"
+    },
+    "Friday::10:30 - 12:00": {
+      "subject": "Computer Network Lab",
+      "teacher": "Mohit Gupta",
+      "room": "01"
+    },
+    "Friday::12:00 - 01:00": {
+      "subject": "Computer Network Lab",
+      "teacher": "Mohit Gupta",
+      "room": "06"
+    },
+    "Friday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Friday::01:30 - 03:00": {
+      "subject": "Database Management System ",
+      "teacher": "Pooja Soni",
+      "room": "06"
+    },
+    "Friday::03:00 - 04:30": {
+      "subject": "Computer Network ",
+      "teacher": "Shailendra Kharkhate",
+      "room": "06"
+    },
+    "Saturday::09:00 - 10:30": {
+      "subject": "Linux And Shell  Programming Lab",
+      "teacher": "Shivam Chauhan ",
+      "room": "01"
+    },
+    "Saturday::10:30 - 12:00": {
+      "subject": "Linux And Shell  Programming Lab",
+      "teacher": "Shivam Chauhan ",
+      "room": "01"
+    },
+    "Saturday::12:00 - 01:00": {
+      "subject": "Linux And Shell  Programming Lab",
+      "teacher": "Shivam Chauhan ",
+      "room": "01"
+    },
+    "Saturday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Saturday::01:30 - 03:00": {
+      "subject": "Database Management System ",
+      "teacher": "",
+      "room": "01"
+    }
+  },
+  "timeSlots": [
+    "09:00 - 10:30",
+    "10:30 - 12:00",
+    "12:00 - 01:00",
+    "01:00 - 01:30",
+    "01:30 - 03:00",
+    "03:00 - 04:30"
+  ],
+  "updatedAt": "2026-03-12T07:59:48.730Z"
+}

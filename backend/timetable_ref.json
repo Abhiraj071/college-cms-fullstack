@@ -1,0 +1,202 @@
+{
+  "_id": "69b269688b7ea53b03527d97",
+  "semester": 2,
+  "course": "Diploma In Computer Science",
+  "year": 1,
+  "__v": 0,
+  "createdAt": "2026-03-12T07:21:12.072Z",
+  "days": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ],
+  "grid": {
+    "Monday::09:00 - 10:30": {
+      "subject": "Programming In C",
+      "teacher": "Pooja Soni",
+      "room": "06"
+    },
+    "Monday::10:30 - 12:00": {
+      "subject": "Basic of Electrical, Electronics & Measurement ",
+      "teacher": "Pankaj Mahar",
+      "room": "06"
+    },
+    "Monday::12:00 - 01:00": {
+      "subject": "Digital Techniques ",
+      "teacher": "Akshay Chauhan",
+      "room": "06"
+    },
+    "Monday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Monday::01:30 - 03:00": {
+      "subject": "Digital Techniques Lab",
+      "teacher": "Akshay Chauhan",
+      "room": "01"
+    },
+    "Monday::03:00 - 04:30": {
+      "subject": "Basic Of Electrical, Electronic & Measurement Lab",
+      "teacher": "Pankaj Mahar",
+      "room": "01"
+    },
+    "Tuesday::09:00 - 10:30": {
+      "subject": "Basic of Electrical, Electronics & Measurement ",
+      "teacher": "Pankaj Mahar",
+      "room": "06"
+    },
+    "Tuesday::10:30 - 12:00": {
+      "subject": "Programming In C",
+      "teacher": "Pooja Soni",
+      "room": "06"
+    },
+    "Tuesday::12:00 - 01:00": {
+      "subject": "Digital Techniques ",
+      "teacher": "Akshay Chauhan",
+      "room": "06"
+    },
+    "Tuesday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Tuesday::01:30 - 03:00": {
+      "subject": "Environmental Engg & Safety ",
+      "teacher": "Bharti Shrivastav",
+      "room": "06"
+    },
+    "Tuesday::03:00 - 04:30": {
+      "subject": "Basic Of Electrical, Electronic & Measurement Lab",
+      "teacher": "Pankaj Mahar",
+      "room": "01"
+    },
+    "Wednesday::09:00 - 10:30": {
+      "subject": "Programming In C",
+      "teacher": "Pooja Soni",
+      "room": "06"
+    },
+    "Wednesday::10:30 - 12:00": {
+      "subject": "Digital Techniques ",
+      "teacher": "Akshay Chauhan",
+      "room": "06"
+    },
+    "Wednesday::12:00 - 01:00": {
+      "subject": "Environmental Engg & Safety ",
+      "teacher": "Bharti Shrivastav",
+      "room": "06"
+    },
+    "Wednesday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Wednesday::01:30 - 03:00": {
+      "subject": "Digital Techniques Lab",
+      "teacher": "Akshay Chauhan",
+      "room": "01"
+    },
+    "Wednesday::03:00 - 04:30": {
+      "subject": "Environmental Egg & safety Lab",
+      "teacher": "Bharti Shrivastav",
+      "room": "01"
+    },
+    "Thursday::09:00 - 10:30": {
+      "subject": "Environmental Engg & Safety ",
+      "teacher": "Bharti Shrivastav",
+      "room": "06"
+    },
+    "Thursday::10:30 - 12:00": {
+      "subject": "Digital Techniques ",
+      "teacher": "Akshay Chauhan",
+      "room": "06"
+    },
+    "Thursday::12:00 - 01:00": {
+      "subject": "Environmental Engg & Safety ",
+      "teacher": "Bharti Shrivastav",
+      "room": "06"
+    },
+    "Thursday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Thursday::01:30 - 03:00": {
+      "subject": "Programming In C Lab",
+      "teacher": "Mohit Gupta",
+      "room": "01"
+    },
+    "Thursday::03:00 - 04:30": {
+      "subject": "Programming In C Lab",
+      "teacher": "Mohit Gupta",
+      "room": "01"
+    },
+    "Friday::09:00 - 10:30": {
+      "subject": "Basic of Electrical, Electronics & Measurement ",
+      "teacher": "Pankaj Mahar",
+      "room": "06"
+    },
+    "Friday::10:30 - 12:00": {
+      "subject": "Electronics Workshop Lab ",
+      "teacher": "Amit Verma",
+      "room": "01"
+    },
+    "Friday::12:00 - 01:00": {
+      "subject": "Programming In C",
+      "teacher": "Pooja Soni",
+      "room": "06"
+    },
+    "Friday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Friday::01:30 - 03:00": {
+      "subject": "Programming In C Lab",
+      "teacher": "Mohit Gupta",
+      "room": "01"
+    },
+    "Friday::03:00 - 04:30": {
+      "subject": "Basic Of Electrical, Electronic & Measurement Lab",
+      "teacher": "Pankaj Mahar",
+      "room": "01"
+    },
+    "Saturday::09:00 - 10:30": {
+      "subject": "Basic of Electrical, Electronics & Measurement ",
+      "teacher": "Pankaj Mahar",
+      "room": "06"
+    },
+    "Saturday::10:30 - 12:00": {
+      "subject": "Environmental Engg & Safety ",
+      "teacher": "Bharti Shrivastav",
+      "room": "06"
+    },
+    "Saturday::12:00 - 01:00": {
+      "subject": "Programming In C Lab",
+      "teacher": "Mohit Gupta",
+      "room": "01"
+    },
+    "Saturday::01:00 - 01:30": {
+      "subject": "Lunch Break",
+      "teacher": "",
+      "room": ""
+    },
+    "Saturday::01:30 - 03:00": {
+      "subject": "Electronics Workshop Lab ",
+      "teacher": "Amit Verma",
+      "room": "01"
+    }
+  },
+  "timeSlots": [
+    "09:00 - 10:30",
+    "10:30 - 12:00",
+    "12:00 - 01:00",
+    "01:00 - 01:30",
+    "01:30 - 03:00",
+    "03:00 - 04:30"
+  ],
+  "updatedAt": "2026-03-12T07:45:36.782Z"
+}

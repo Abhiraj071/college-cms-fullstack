@@ -1,0 +1,568 @@
+{
+  "subjects": [
+    {
+      "id": "69b262af23e2540b0eab7389",
+      "name": "Computer Graphics, Multimedia & Animation "
+    },
+    {
+      "id": "69b262ca23e2540b0eab738f",
+      "name": "Advanced Web Technology "
+    },
+    {
+      "id": "69b262e223e2540b0eab7395",
+      "name": "Advanced Web Technology Lab"
+    },
+    {
+      "id": "69b2631d23e2540b0eab739b",
+      "name": "Artificial,  Intelligence & Expert"
+    },
+    {
+      "id": "69b2634223e2540b0eab73a1",
+      "name": "Artificial, Intelligence & Expert Lab"
+    },
+    {
+      "id": "69b2638823e2540b0eab73a7",
+      "name": "Computer Graphics, Multimedia & Animation Lab"
+    },
+    {
+      "id": "69b263b323e2540b0eab73ad",
+      "name": "Project "
+    },
+    {
+      "id": "69b2646523e2540b0eab73b7",
+      "name": "Basic of Electrical, Electronics & Measurement "
+    },
+    {
+      "id": "69b2649723e2540b0eab73bd",
+      "name": "Digital Techniques "
+    },
+    {
+      "id": "69b264dc23e2540b0eab73c7",
+      "name": "Digital Techniques Lab"
+    },
+    {
+      "id": "69b2652523e2540b0eab73cd",
+      "name": "Basic Of Electrical, Electronic & Measurement Lab"
+    },
+    {
+      "id": "69b2657223e2540b0eab73d3",
+      "name": "Environmental Engg & Safety "
+    },
+    {
+      "id": "69b265ad23e2540b0eab73d9",
+      "name": "Environmental Egg & safety Lab"
+    },
+    {
+      "id": "69b265f023e2540b0eab73df",
+      "name": "Electronics Workshop Lab "
+    },
+    {
+      "id": "69b2666423e2540b0eab73e5",
+      "name": "Programming In C"
+    },
+    {
+      "id": "69b266bc23e2540b0eab73eb",
+      "name": "Programming In C Lab"
+    },
+    {
+      "id": "69b2671623e2540b0eab73f1",
+      "name": "Microprocessor & Interface Lab "
+    },
+    {
+      "id": "69b2673a23e2540b0eab73f7",
+      "name": "Database Management System Lab"
+    },
+    {
+      "id": "69b2676e23e2540b0eab73fd",
+      "name": "Entrepreneurship "
+    },
+    {
+      "id": "69b2679423e2540b0eab7403",
+      "name": "Linux And Shell Programming "
+    },
+    {
+      "id": "69b267b723e2540b0eab7409",
+      "name": "Computer Network Lab"
+    },
+    {
+      "id": "69b267df23e2540b0eab740f",
+      "name": "Linux And Shell  Programming Lab"
+    },
+    {
+      "id": "69b2681023e2540b0eab7415",
+      "name": "Microprocessor & Interface "
+    },
+    {
+      "id": "69b2682f23e2540b0eab741b",
+      "name": "Computer Network "
+    },
+    {
+      "id": "69b268aa23e2540b0eab7421",
+      "name": "Database Management System "
+    }
+  ],
+  "students": [
+    {
+      "id": "69b25d3123e2540b0eab7196",
+      "name": "Aayush Bagri",
+      "rollNo": "80301",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d3223e2540b0eab719c",
+      "name": "Abhishek Chauhan",
+      "rollNo": "80302",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d3423e2540b0eab71a2",
+      "name": "Abhishek Vishwakarma",
+      "rollNo": "80304",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d3523e2540b0eab71a8",
+      "name": "Aditya Kumar",
+      "rollNo": "80305",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d3623e2540b0eab71ae",
+      "name": "Ayush Gupta",
+      "rollNo": "80306",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d3823e2540b0eab71b4",
+      "name": "Apurna Pal",
+      "rollNo": "80307",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d3923e2540b0eab71ba",
+      "name": "Atharv Gaur",
+      "rollNo": "80309",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d3b23e2540b0eab71c0",
+      "name": "Gajanan Chhangani",
+      "rollNo": "80311",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d3c23e2540b0eab71c6",
+      "name": "Kunal Kushwaha",
+      "rollNo": "80316",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d3d23e2540b0eab71cc",
+      "name": "Lakshya Rehke",
+      "rollNo": "80317",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d3f23e2540b0eab71d2",
+      "name": "Manish Kumar Pal",
+      "rollNo": "80318",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4023e2540b0eab71d8",
+      "name": "Manish Yadav",
+      "rollNo": "80320",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4123e2540b0eab71de",
+      "name": "Mayank Prajapat",
+      "rollNo": "80322",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4323e2540b0eab71e4",
+      "name": "Muskan Bijore",
+      "rollNo": "80323",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4423e2540b0eab71ea",
+      "name": "Narendra Singh K",
+      "rollNo": "80324",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4523e2540b0eab71f0",
+      "name": "Nikita Fmane",
+      "rollNo": "80326",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4723e2540b0eab71f6",
+      "name": "Nilesh Patan Co",
+      "rollNo": "80327",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4823e2540b0eab71fc",
+      "name": "Parth Parihar",
+      "rollNo": "80329",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4923e2540b0eab7202",
+      "name": "Pawan Buivekar",
+      "rollNo": "80330",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4b23e2540b0eab7208",
+      "name": "Pushkar Takle",
+      "rollNo": "80333",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4c23e2540b0eab720e",
+      "name": "Rohit Prajapati",
+      "rollNo": "80335",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4d23e2540b0eab7214",
+      "name": "Sai Dhondge",
+      "rollNo": "80337",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d4f23e2540b0eab721a",
+      "name": "Sankalp Pal",
+      "rollNo": "80340",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d5023e2540b0eab7220",
+      "name": "Shlok Kadam",
+      "rollNo": "80341",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d5223e2540b0eab7226",
+      "name": "Ujwal Rawat",
+      "rollNo": "80343",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d5323e2540b0eab722c",
+      "name": "Yogeta Rana",
+      "rollNo": "80344",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d5423e2540b0eab7232",
+      "name": "Badal Dhape",
+      "rollNo": "80345",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d5523e2540b0eab7238",
+      "name": "Khushboo Ahirwar",
+      "rollNo": "80346",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d5723e2540b0eab723e",
+      "name": "Vishal Prajapati",
+      "rollNo": "80348",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25d5823e2540b0eab7244",
+      "name": "Prince Solanki",
+      "rollNo": "80231",
+      "course": "Diploma In Computer Science",
+      "semester": 6
+    },
+    {
+      "id": "69b25ece23e2540b0eab7277",
+      "name": "Aditya Tomar",
+      "rollNo": "80401",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ed023e2540b0eab727d",
+      "name": "Ajay Parmar",
+      "rollNo": "80402",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ed123e2540b0eab7283",
+      "name": "Bawaskar Aditya Sanjay",
+      "rollNo": "80403",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ed323e2540b0eab7289",
+      "name": "Hansraj Salawat",
+      "rollNo": "80404",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ed423e2540b0eab728f",
+      "name": "Hardik Tripathi",
+      "rollNo": "80405",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ed523e2540b0eab7295",
+      "name": "Harshit Anvliya",
+      "rollNo": "80406",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ed723e2540b0eab729b",
+      "name": "Kanadje Ravindra Bhanudas",
+      "rollNo": "80407",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ed823e2540b0eab72a1",
+      "name": "Khwahish Sahare",
+      "rollNo": "80408",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25eda23e2540b0eab72a7",
+      "name": "Nitin Kuril",
+      "rollNo": "80412",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25edb23e2540b0eab72ad",
+      "name": "Paragi Dixit",
+      "rollNo": "80413",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25edd23e2540b0eab72b3",
+      "name": "Pooja",
+      "rollNo": "80414",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ede23e2540b0eab72b9",
+      "name": "Priti Prajapati",
+      "rollNo": "80416",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25edf23e2540b0eab72bf",
+      "name": "Purvansh Ahirwal",
+      "rollNo": "80417",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ee123e2540b0eab72c5",
+      "name": "Ritu Rajput",
+      "rollNo": "80418",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ee223e2540b0eab72cb",
+      "name": "Rohan Chouhan",
+      "rollNo": "80419",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ee423e2540b0eab72d1",
+      "name": "Saloni Rajput",
+      "rollNo": "80420",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ee523e2540b0eab72d7",
+      "name": "Samarth Salgat",
+      "rollNo": "80421",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ee623e2540b0eab72dd",
+      "name": "Shivam Yadav",
+      "rollNo": "80422",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ee823e2540b0eab72e3",
+      "name": "Sontakke Gouri Sadanand",
+      "rollNo": "80424",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25ee923e2540b0eab72e9",
+      "name": "Syed Suleman Ahemad",
+      "rollNo": "80425",
+      "course": "Diploma In Computer Science",
+      "semester": 4
+    },
+    {
+      "id": "69b25fdc23e2540b0eab72f3",
+      "name": "Abhishek Kumar Badoliya",
+      "rollNo": "80501",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fdd23e2540b0eab72f9",
+      "name": "Dheeraj Kumar Sahu",
+      "rollNo": "80502",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fde23e2540b0eab72ff",
+      "name": "Harshit Kumar",
+      "rollNo": "80503",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fe023e2540b0eab7305",
+      "name": "Krishna Murari Chauhan",
+      "rollNo": "80504",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fe123e2540b0eab730b",
+      "name": "Mahi Yadav",
+      "rollNo": "80505",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fe223e2540b0eab7311",
+      "name": "Pratima",
+      "rollNo": "80506",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fe423e2540b0eab7317",
+      "name": "Rishika Pandey",
+      "rollNo": "80508",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fe523e2540b0eab731d",
+      "name": "Rohan Solanki",
+      "rollNo": "80509",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fe723e2540b0eab7323",
+      "name": "Roodra Shakya",
+      "rollNo": "80510",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fe823e2540b0eab7329",
+      "name": "Shreshth Yeotikar",
+      "rollNo": "80511",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fe923e2540b0eab732f",
+      "name": "Shubhi Bhorhari",
+      "rollNo": "80512",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25feb23e2540b0eab7335",
+      "name": "Sunny Basane",
+      "rollNo": "80513",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fec23e2540b0eab733b",
+      "name": "Vaibhav Rathore",
+      "rollNo": "80514",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fed23e2540b0eab7341",
+      "name": "Vinod Longare",
+      "rollNo": "80515",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25fef23e2540b0eab7347",
+      "name": "Chhaya Koshti",
+      "rollNo": "80516",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    },
+    {
+      "id": "69b25ff023e2540b0eab734d",
+      "name": "Yugank Vishwakarma",
+      "rollNo": "80517",
+      "course": "Diploma In Computer Science",
+      "semester": 2
+    }
+  ]
+}

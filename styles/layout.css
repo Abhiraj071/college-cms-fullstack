@@ -11,10 +11,11 @@
 .main-content {
     margin-left: 260px;
     flex: 1;
-    padding: var(--space-md);
+    padding: var(--space-xl);
     min-height: 100vh;
     transition: all 0.3s ease;
     overflow-x: hidden;
+    background-color: var(--bg-primary);
 }
 
 .sidebar {
@@ -26,16 +27,25 @@
     z-index: 1000;
     display: flex;
     flex-direction: column;
-    padding: var(--space-md);
-    background: var(--bg-secondary) !important;
-    border-right: 1px solid var(--glass-border);
+    padding: var(--space-lg) var(--space-md);
+    background: #111827 !important; /* Force dark sidebar for premium SaaS look */
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    color: #E5E7EB !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure Logo text in sidebar blends nicely */
+.sidebar h2 {
+    color: #FFFFFF !important;
+    letter-spacing: -0.03em;
+    font-weight: 700;
 }
 
 /* Sidebar Responsive */
 @media (max-width: 1024px) {
     .main-content {
         margin-left: 0 !important;
-        padding: 1rem;
+        padding: var(--space-md);
     }
 
     .sidebar {
@@ -46,7 +56,7 @@
 
     .sidebar.open {
         transform: translateX(0);
-        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.2);
+        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5); /* Stronger shadow on mobile */
     }
 }
 
@@ -57,8 +67,8 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(15, 23, 42, 0.3);
-    backdrop-filter: blur(4px);
+    background: rgba(17, 24, 39, 0.5);
+    backdrop-filter: blur(2px);
     z-index: 999;
     opacity: 0;
     visibility: hidden;

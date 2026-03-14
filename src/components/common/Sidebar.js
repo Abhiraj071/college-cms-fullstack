@@ -17,8 +17,8 @@ export class Sidebar {
         aside.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; padding: 0 1rem;">
                 <div>
-                    <h2 style="margin:0; background: linear-gradient(135deg, var(--text-primary), var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">CollegeOS</h2>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Enterprise v2.0</p>
+                    <h2 style="margin:0; background: linear-gradient(135deg, #FFFFFF, var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">CollegeOS</h2>
+                    <p style="font-size: 0.8rem; color: #94A3B8;">Enterprise v2.0</p>
                 </div>
                 <button id="closeSidebar" class="glass-button mobile-only" style="padding: 10px; background: rgba(0,0,0,0.05);">✕</button>
             </div>
@@ -27,14 +27,14 @@ export class Sidebar {
                 <!-- Links injected here -->
             </nav>
 
-            <div style="padding: 1.5rem 1rem; border-top: 1px solid var(--glass-border);">
+            <div style="padding: 1.5rem 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
                 <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="window.location.hash='${ROUTES.PROFILE}'">
                     <div style="width: 38px; height: 38px; background: var(--accent-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">
                         ${(this.user.name || 'U').charAt(0)}
                     </div>
                     <div style="overflow: hidden;">
-                        <p style="font-size: 0.9rem; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; margin: 0;">${this.user.name}</p>
-                        <p style="font-size: 0.75rem; color: var(--text-secondary); text-transform: capitalize; margin: 0;">${this.user.role}</p>
+                        <p style="font-size: 0.9rem; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; margin: 0; color: var(--sidebar-text);">${this.user.name}</p>
+                        <p style="font-size: 0.75rem; color: var(--sidebar-text-secondary); text-transform: capitalize; margin: 0;">${this.user.role}</p>
                     </div>
                 </div>
             </div>
@@ -86,8 +86,8 @@ export class Sidebar {
     getLinks() {
         const role = this.user.role;
         const common = [
-            { href: `#${ROUTES.DASHBOARD}`, label: 'Dashboard', icon: '💎' },
-            { href: `#${ROUTES.NOTICES}`, label: 'Notice Board', icon: '📢' },
+            { href: `#${ROUTES.DASHBOARD}`, label: 'Dashboard', icon: '📊' },
+            { href: `#${ROUTES.NOTICES}`, label: 'Notices', icon: '📢' },
         ];
 
 
@@ -96,10 +96,10 @@ export class Sidebar {
                 ...common,
                 { href: `#${ROUTES.STUDENTS_LIST}`, label: 'Students', icon: '👨‍🎓' },
                 { href: `#${ROUTES.FACULTY_LIST}`, label: 'Faculty', icon: '👨‍🏫' },
-                { href: `#${ROUTES.COURSES_LIST}`, label: 'Courses (Beta)', icon: '📚' },
+                { href: `#${ROUTES.COURSES_LIST}`, label: 'Courses', icon: '📚' },
                 { href: `#${ROUTES.SUBJECTS_LIST}`, label: 'Subjects', icon: '📖' },
-                { href: `#${ROUTES.TIMETABLE}`, label: 'Timetable (Beta)', icon: '📅' },
-                { href: `#${ROUTES.REPORTS}`, label: 'Reports (Beta)', icon: '📈' },
+                { href: `#${ROUTES.TIMETABLE}`, label: 'Timetable', icon: '📅' },
+                { href: `#${ROUTES.REPORTS}`, label: 'Reports', icon: '📈' },
                 { href: `#${ROUTES.SETTINGS}`, label: 'Settings', icon: '⚙️' }
             ];
         } else if (role === ROLES.TEACHER) {
@@ -107,8 +107,8 @@ export class Sidebar {
                 ...common,
                 { href: `#${ROUTES.SUBJECTS_LIST}?mode=assigned`, label: 'My Classes', icon: '🏫' },
                 { href: `#${ROUTES.TIMETABLE}`, label: 'Timetable', icon: '📅' },
-                { href: `#${ROUTES.ATTENDANCE}`, label: 'Attendance', icon: '📝' },
-                { href: `#${ROUTES.ASSIGNMENTS}`, label: 'Assignments', icon: '✍️' },
+                { href: `#${ROUTES.ATTENDANCE}`, label: 'Attendance', icon: '✅' },
+                { href: `#${ROUTES.ASSIGNMENTS}`, label: 'Assignments', icon: '📝' },
                 { href: `#${ROUTES.REPORTS}`, label: 'Reports', icon: '📈' }
             ];
         } else {
@@ -116,10 +116,9 @@ export class Sidebar {
             return [
                 ...common,
                 { href: `#${ROUTES.SUBJECTS_LIST}`, label: 'Subjects', icon: '📚' },
-                { href: `#${ROUTES.TIMETABLE}`, label: 'Timetable', icon: '🗓️' },
-                { href: `#${ROUTES.ATTENDANCE}`, label: 'Attendance', icon: '📝' },
-                { href: `#${ROUTES.ASSIGNMENTS}`, label: 'Assignments', icon: '🧾' },
-                // { href: '#', label: 'Messages', icon: '💬' } // Placeholder if no route
+                { href: `#${ROUTES.TIMETABLE}`, label: 'Timetable', icon: '🕒' },
+                { href: `#${ROUTES.ATTENDANCE}`, label: 'Attendance', icon: '📅' },
+                { href: `#${ROUTES.ASSIGNMENTS}`, label: 'Assignments', icon: '📝' },
             ];
         }
     }

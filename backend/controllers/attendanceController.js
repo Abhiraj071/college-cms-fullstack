@@ -31,6 +31,40 @@ exports.markAttendance = async (req, res) => {
             },
             { upsert: true, new: true }
         );
+
+        const Student = require('../models/Student');
+        for (const studentRec of students) {
+            const sId = studentRec.studentId;
+            const allRecords = await Attendance.find({ 'students.studentId': sId });
+            
+            let presentCount = 0;
+            let absentCount = 0;
+            
+            for (const rec of allRecords) {
+                const sData = rec.students.find(s => s.studentId.toString() === sId.toString());
+                if (sData) {
+                    if (sData.status === 'Present') {
+                        presentCount++;
+                    } else if (sData.status === 'Absent') {
+                        absentCount++;
+                    }
+                }
+            }
+            
+            const totalClasses = presentCount + absentCount;
+            let percentage = "0%";
+            if (totalClasses > 0) {
+                percentage = Math.round((presentCount / totalClasses) * 100) + "%";
+            }
+            
+            await Student.findByIdAndUpdate(sId, {
+                present: presentCount,
+                absent: absentCount,
+                totalClasses: totalClasses,
+                attendancePercentage: percentage
+            });
+        }
+
         res.json(record);
     } catch (err) {
         res.status(400).json({ message: err.message });

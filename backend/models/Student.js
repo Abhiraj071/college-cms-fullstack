@@ -40,6 +40,22 @@ const studentSchema = new mongoose.Schema({
     cgpa: {
         type: Number,
         default: 0.0
+    },
+    present: {
+        type: Number,
+        default: 0
+    },
+    absent: {
+        type: Number,
+        default: 0
+    },
+    totalClasses: {
+        type: Number,
+        default: 0
+    },
+    attendancePercentage: {
+        type: String,
+        default: "0%"
     }
 }, {
     timestamps: true

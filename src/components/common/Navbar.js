@@ -25,10 +25,10 @@ export class Navbar {
                 <h2 style="margin: 0; font-size: 1.2rem;">${this.title}</h2>
             </div>
             <div style="display: flex; gap: 0.75rem;">
-                <button id="themeToggle" class="glass-button" title="Switch Theme" style="padding: 8px 12px; font-size: 1.2rem;">
+                <button id="themeToggle" class="glass-button" title="Switch Theme" style="padding: 8px 12px; font-size: 1.2rem; background: var(--bg-secondary); border: 1px solid var(--glass-border); color: var(--text-primary);">
                     ${ThemeService.getCurrentTheme() === 'dark' ? '☀️' : '🌙'}
                 </button>
-                <button id="logoutBtn" class="glass-button" style="padding: 8px 16px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #fca5a5; font-size: 0.9rem;">
+                <button id="logoutBtn" class="glass-button" style="padding: 8px 16px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: var(--danger); font-size: 0.9rem; font-weight: 700;">
                     Logout
                 </button>
             </div>
@@ -50,9 +50,10 @@ export class Navbar {
             if (backdrop) backdrop.classList.toggle('active');
         });
 
-        nav.querySelector('#themeToggle').addEventListener('click', (e) => {
+        const themeToggle = nav.querySelector('#themeToggle');
+        themeToggle.addEventListener('click', () => {
             const newTheme = ThemeService.cycleNext();
-            e.currentTarget.innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
+            themeToggle.innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
         });
 
         nav.querySelector('#logoutBtn').addEventListener('click', this.logoutCallback);

@@ -16,8 +16,44 @@ export class BookList {
         const container = document.createElement('div');
         container.className = 'fade-in';
         const user = auth.getUser();
+        const isAdmin = user.role === 'admin';
 
-        // 1. Stats Bar
+        // Header Section
+        const header = document.createElement('div');
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'flex-end';
+        header.style.marginBottom = '2.5rem';
+        header.style.flexWrap = 'wrap';
+        header.style.gap = '1.5rem';
+
+        const titleSection = document.createElement('div');
+        titleSection.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 0.5rem;">
+                <span style="font-size: 2rem;">📚</span>
+                <h2 style="font-size: 2rem; margin: 0; letter-spacing: -1px;">Digital Library</h2>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 1rem; font-weight: 500;">Explore the academic repository and manage resource inventory.</p>
+        `;
+
+        if (isAdmin) {
+            const addBtn = document.createElement('button');
+            addBtn.className = 'glass-button';
+            addBtn.style.background = 'var(--accent-color)';
+            addBtn.style.color = 'white';
+            addBtn.style.border = 'none';
+            addBtn.style.padding = '10px 24px';
+            addBtn.style.fontWeight = '700';
+            addBtn.textContent = '➕ Add Asset';
+            addBtn.onclick = () => { window.location.hash = ROUTES.LIBRARY_ADD; };
+            header.appendChild(titleSection);
+            header.appendChild(addBtn);
+        } else {
+            header.appendChild(titleSection);
+        }
+        container.appendChild(header);
+
+        // Stats Bar
         const statsBar = document.createElement('div');
         statsBar.style.display = 'grid';
         statsBar.style.gridTemplateColumns = 'repeat(auto-fit, minmax(200px, 1fr))';
@@ -26,117 +62,97 @@ export class BookList {
         statsBar.id = 'stats-bar';
         container.appendChild(statsBar);
 
-        // 2. Control Bar (Search & Filter)
-        const controlBar = document.createElement('div');
-        controlBar.className = 'glass-panel';
-        controlBar.style.padding = '1rem 1.5rem';
-        controlBar.style.marginBottom = '2rem';
-        controlBar.style.display = 'flex';
-        controlBar.style.gap = '1rem';
-        controlBar.style.alignItems = 'center';
-        controlBar.style.flexWrap = 'wrap';
+        // Control Bar
+        const filterBar = document.createElement('div');
+        filterBar.className = 'glass-panel';
+        filterBar.style.padding = '1rem';
+        filterBar.style.marginBottom = '2rem';
+        filterBar.style.display = 'flex';
+        filterBar.style.gap = '1rem';
+        filterBar.style.alignItems = 'center';
+        filterBar.style.flexWrap = 'wrap';
+        filterBar.style.background = 'var(--bg-secondary)';
 
-        controlBar.innerHTML = `
+        filterBar.innerHTML = `
             <div style="flex: 1; min-width: 250px;">
-                <input type="text" id="bookSearch" placeholder="Search by Title, Author or ISBN..." value="${this.searchTerm}">
+                <label style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">Search Catalog</label>
+                <input type="text" id="bookSearch" placeholder="Filter by title, author or ISBN..." value="${this.searchTerm}">
             </div>
-            <div style="width: 200px;">
+            <div style="width: 220px;">
+                <label style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">Narrow by Discipline</label>
                 <select id="categoryFilter">
-                    <option value="All">All Categories</option>
-                    <option value="Computer Science">Computer Science</option>
-                    <option value="Mathematics">Mathematics</option>
-                    <option value="Physics">Physics</option>
-                    <option value="Literature">Literature</option>
-                    <option value="History">History</option>
+                    <option value="All">All Disciplines</option>
+                    <option value="Computer Science">💻 Computer Science</option>
+                    <option value="Mathematics">🔢 Mathematics</option>
+                    <option value="Physics">⚛️ Physics</option>
+                    <option value="Literature">📖 Literature</option>
+                    <option value="History">🏛️ History</option>
                 </select>
             </div>
-            ${user.role === 'admin' ? `
-                <button class="glass-button" id="addNewBookBtn">+ Add Book</button>
-            ` : ''}
         `;
-        container.appendChild(controlBar);
+        container.appendChild(filterBar);
 
-        if (user.role === 'admin') {
-            /** @type {HTMLElement} */ (controlBar.querySelector('#addNewBookBtn')).onclick = () => {
-                window.location.hash = 'library/add';
-            };
-        }
-
-        // 3. Grid/Table Container
         const listContainer = document.createElement('div');
         listContainer.id = 'book-list-results';
         container.appendChild(listContainer);
 
         const loadData = async () => {
-            listContainer.innerHTML = '<div style="padding: 2rem; text-align: center;">Loading library inventory...</div>';
+            listContainer.innerHTML = `
+                <div style="padding: 5rem; text-align: center;">
+                    <div class="loader-spinner" style="width: 40px; height: 40px; border: 4px solid var(--accent-glow); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1.5rem;"></div>
+                    <p style="color: var(--text-secondary); font-weight: 500;">Indexing library vault...</p>
+                </div>
+            `;
             try {
                 this.allBooks = await ApiService.getBooks();
                 this.updateStats(statsBar);
                 this.updateList(listContainer, user);
-            } catch (err) {
-                Toast.error('Failed to load books: ' + err.message);
-                listContainer.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`;
-            }
+            } catch (err) { Toast.error('Sync Error'); }
         };
 
-        // Events
-        const searchInput = /** @type {HTMLInputElement} */ (controlBar.querySelector('#bookSearch'));
-        const categoryFilter = /** @type {HTMLSelectElement} */ (controlBar.querySelector('#categoryFilter'));
-        categoryFilter.value = this.selectedCategory;
-
-        searchInput.addEventListener('input', (e) => {
-            this.searchTerm = /** @type {HTMLInputElement} */ (e.target).value;
-            this.updateList(listContainer, user);
-        });
-
-        categoryFilter.addEventListener('change', (e) => {
-            this.selectedCategory = /** @type {HTMLSelectElement} */ (e.target).value;
-            this.updateList(listContainer, user);
-        });
+        const searchIn = filterBar.querySelector('#bookSearch');
+        const catFil = filterBar.querySelector('#categoryFilter');
+        catFil.value = this.selectedCategory;
+        searchIn.oninput = (e) => { this.searchTerm = e.target.value; this.updateList(listContainer, user); };
+        catFil.onchange = (e) => { this.selectedCategory = e.target.value; this.updateList(listContainer, user); };
 
         loadData();
-
         return container;
     }
 
-    updateStats(statsBar) {
-        const total = this.allBooks.length;
-        const available = this.allBooks.filter(b => b.status === 'Available').length;
-        const outOfStock = this.allBooks.filter(b => b.status === 'Out of Stock' || (b.available === 0)).length;
-
-        statsBar.innerHTML = `
-            <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
-                <div style="font-size: 0.9rem; color: var(--text-secondary);">Total Titles</div>
-                <div style="font-size: 2rem; font-weight: bold; color: var(--accent-color);">${total}</div>
+    updateStats(bar) {
+        const t = this.allBooks.length;
+        const a = this.allBooks.filter(b => b.available > 0).length;
+        bar.innerHTML = `
+            <div class="glass-panel" style="padding: 1.5rem; text-align: center; border: 1px solid var(--glass-border);">
+                <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Total Assets</div>
+                <div style="font-size: 2rem; font-weight: 800; color: var(--accent-color);">${t}</div>
             </div>
-            <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
-                <div style="font-size: 0.9rem; color: var(--text-secondary);">Available</div>
-                <div style="font-size: 2rem; font-weight: bold; color: var(--success);">${available}</div>
+            <div class="glass-panel" style="padding: 1.5rem; text-align: center; border: 1px solid var(--glass-border);">
+                <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Instock Circulation</div>
+                <div style="font-size: 2rem; font-weight: 800; color: var(--success);">${a}</div>
             </div>
-            <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
-                <div style="font-size: 0.9rem; color: var(--text-secondary);">Stock Status</div>
-                <div style="font-size: 1.5rem; font-weight: bold; color: var(--warning);">${total - outOfStock} In Stock</div>
+            <div class="glass-panel" style="padding: 1.5rem; text-align: center; border: 1px solid var(--glass-border);">
+                <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Current Outflow</div>
+                <div style="font-size: 2rem; font-weight: 800; color: var(--warning);">${t - a}</div>
             </div>
         `;
     }
 
     updateList(container, user) {
         container.innerHTML = '';
-
-        // Apply Filtering
-        let books = this.allBooks.filter(book => {
-            const matchesSearch = book.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                book.author.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                (book.isbn && book.isbn.includes(this.searchTerm));
-            const matchesCategory = this.selectedCategory === 'All' || book.category === this.selectedCategory;
-            return matchesSearch && matchesCategory;
+        let filtered = this.allBooks.filter(b => {
+            const mS = b.title.toLowerCase().includes(this.searchTerm.toLowerCase()) || b.author.toLowerCase().includes(this.searchTerm.toLowerCase()) || (b.isbn && b.isbn.includes(this.searchTerm));
+            const mC = this.selectedCategory === 'All' || b.category === this.selectedCategory;
+            return mS && mC;
         });
 
-        if (books.length === 0) {
+        if (filtered.length === 0) {
             container.innerHTML = `
-                <div class="glass-panel" style="padding: 3rem; text-align: center; color: var(--text-secondary);">
-                    <div style="font-size: 2rem; margin-bottom: 1rem;">📚</div>
-                    <p>No books found matching your criteria.</p>
+                <div class="glass-panel" style="padding: 5rem 2rem; text-align: center; border: 1px dashed var(--glass-border); border-radius: 16px;">
+                    <div style="font-size: 3rem; margin-bottom: 1.5rem; opacity: 0.2;">📚</div>
+                    <h3 style="opacity: 0.6;">Repository Empty</h3>
+                    <p style="color: var(--text-secondary); max-width: 320px; margin: 0 auto;">No assets found matching the current search parameters.</p>
                 </div>
             `;
             return;
@@ -144,66 +160,24 @@ export class BookList {
 
         const table = new Table({
             columns: [
-                {
-                    key: 'title', label: 'Book Details', render: (val, item) => `
-                    <div style="font-weight: 500;">${val}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-secondary);">${item.author} | ISBN: ${item.isbn || 'N/A'}</div>
-                `},
-                { key: 'category', label: 'Category' },
-                {
-                    key: 'status', label: 'Status', render: (val, item) => {
-                        const status = (item.available > 0) ? 'Available' : 'Out of Stock';
-                        const color = status === 'Available' ? 'var(--success)' : 'var(--danger)';
-                        const bg = status === 'Available' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
-                        return `<span style="padding: 4px 12px; background: ${bg}; color: ${color}; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${status}</span>`;
-                    }
-                },
-                {
-                    key: 'available', label: 'Stock', render: (val, item) => `${val} / ${item.quantity}`
-                },
-                {
-                    key: '_id', label: 'Actions', render: (val, item) => {
-                        if (user.role !== 'admin') return '-';
-
-                        return `
-                            <div style="display: flex; gap: 0.5rem;">
-                                <button class="edit-book-btn glass-button" data-id="${val}" style="padding: 4px 12px; font-size: 0.8rem;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                    Edit
-                                </button>
-                            </div>
-                        `;
-                    }
-                }
+                { key: 'title', label: 'Inventory Identity', render: (v, item) => `<div><div style="font-weight: 800; color: var(--text-primary); font-size: 0.95rem;">${v}</div><div style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 700;">${item.author} • ISBN: ${item.isbn || '---'}</div></div>` },
+                { key: 'category', label: 'Discipline', render: (v) => `<span style="font-weight: 700; color: var(--text-secondary); font-size: 0.85rem;">${v}</span>` },
+                { key: 'status', label: 'Status', render: (v, item) => {
+                    const instock = item.available > 0;
+                    return `<span style="padding: 4px 10px; background: ${instock ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; border-radius: 20px; font-size: 0.7rem; font-weight: 800; color: ${instock ? 'var(--success)' : 'var(--danger)'}; text-transform: uppercase;">${instock ? 'Instock' : 'Borrowed'}</span>`;
+                }},
+                { key: 'available', label: 'Stock Distribution', render: (v, item) => `<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 60px; height: 6px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden;"><div style="width: ${(v/item.quantity)*100}%; height: 100%; background: var(--accent-color);"></div></div><span style="font-size: 0.75rem; font-weight: 800; opacity: 0.7;">${v}/${item.quantity}</span></div>` }
             ],
-            data: books,
-            onEdit: null,
-            onDelete: user.role === 'admin' ? (id) => {
-                const book = books.find(b => b._id === id);
-                Modal.confirm('Delete Book Record?', `Are you sure you want to remove ${book?.title || 'this book'} from the library catalog?`, async () => {
-                    try {
-                        await ApiService.deleteBook(id);
-                        window.location.reload();
-                        Toast.success('Book record removed.');
-                    } catch (err) {
-                        Toast.error(err.message);
-                    }
+            data: filtered,
+            onEdit: user.role !== 'admin' ? null : (id) => window.location.hash = ROUTES.LIBRARY_EDIT.replace(':id', id),
+            onDelete: user.role !== 'admin' ? null : (id) => {
+                const b = filtered.find(x => x._id === id);
+                Modal.confirm('Purge Asset?', `Remove ${b?.title} from the library catalog permanently?`, async () => {
+                    try { await ApiService.deleteBook(id); this.allBooks = this.allBooks.filter(x => x._id !== id); this.updateStats(document.getElementById('stats-bar')); this.updateList(container, user); Toast.success('Asset Purged'); }
+                    catch (err) { Toast.error(err.message); }
                 });
-            } : null
-        });
-
-        const tableNode = table.render();
-
-        tableNode.addEventListener('click', (e) => {
-            if (!(e.target instanceof Element)) return;
-
-            const editBtn = e.target.closest('.edit-book-btn');
-            if (editBtn) {
-                const bookId = /** @type {HTMLElement} */ (editBtn).dataset.id;
-                window.location.hash = ROUTES.LIBRARY_EDIT.replace(':id', bookId);
             }
         });
-
-        container.appendChild(tableNode);
+        container.appendChild(table.render());
     }
 }
