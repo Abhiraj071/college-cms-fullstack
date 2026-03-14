@@ -47,7 +47,7 @@ app.use('/api/study-materials', require('./routes/studyMaterialRoutes'));
 // Serve Frontend Static Files
 const root = path.join(__dirname, '../');
 app.use(express.static(root, {
-    maxAge: '1d',
+    maxAge: 0,
     index: false
 }));
 
