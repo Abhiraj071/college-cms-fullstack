@@ -42,7 +42,6 @@ app.use('/api/books',           protect, require('./routes/bookRoutes'));
 app.use('/api/study-materials', protect, require('./routes/studyMaterialRoutes'));
 app.use('/api/search',          protect, require('./routes/searchRoutes'));
 app.use('/api/upload',          protect, require('./routes/uploadRoutes'));
-app.use('/api/exams',           protect, require('./routes/examRoutes'));
 app.use('/api/email',           protect, authorize('admin'), require('./routes/emailRoutes'));
 app.use('/api/system',          protect, authorize('admin'), require('./routes/systemRoutes'));
 
