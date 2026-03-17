@@ -371,6 +371,29 @@ export class ApiService {
         });
     }
 
+    // ── Exams ─────────────────────────────────────────────────────────────────
+    static async getExams() {
+        return await this.request('/exams');
+    }
+    static async addExam(data) {
+        return await this.request('/exams', { method: 'POST', body: JSON.stringify(data) });
+    }
+    static async updateExam(id, data) {
+        return await this.request(`/exams/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+    }
+    static async deleteExam(id) {
+        return await this.request(`/exams/${id}`, { method: 'DELETE' });
+    }
+    static async getMarksByExam(examId) {
+        return await this.request(`/exams/${examId}/marks`);
+    }
+    static async getStudentMarks(studentId) {
+        return await this.request(`/exams/marks/student/${studentId}`);
+    }
+    static async updateMarks(data) {
+        return await this.request('/exams/marks', { method: 'POST', body: JSON.stringify(data) });
+    }
+
     // ── Analytics ─────────────────────────────────────────────────────────────
     static async getAnalyticsSummary() {
         return await this.request('/analytics/summary');
