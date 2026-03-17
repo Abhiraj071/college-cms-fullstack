@@ -48,7 +48,7 @@ app.use('/api/system',          protect, authorize('admin'), require('./routes/s
 // ─── Serve Frontend ───────────────────────────────────────────────────────────
 const frontendPath = path.join(__dirname, '..');
 app.use(express.static(frontendPath));
-app.get('*', (req, res) => {
+app.get('/{*path}', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
