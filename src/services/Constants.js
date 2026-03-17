@@ -52,7 +52,8 @@ export const ROUTES = {
     REPORTS: 'reports',
     SETTINGS: 'settings',
 
-
+    // New Features
+    CALENDAR: 'calendar',
 
     // Auth
     LOGIN: 'login'

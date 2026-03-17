@@ -1,12 +1,16 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Faculty = require('../models/Faculty'); // moved to top-level (not inside hot path)
 
-// Register User (Admin Only usually, or initial setup)
+// Register User – should only be called by admin after initial setup
 exports.register = async (req, res) => {
     try {
         const { username, email } = req.body;
 
-        // Check if user exists
+        if (!username || !email || !req.body.password || !req.body.name || !req.body.role) {
+            return res.status(400).json({ message: 'username, email, password, name and role are required' });
+        }
+
         let user = await User.findOne({ $or: [{ username }, { email }] });
         if (user) {
             return res.status(400).json({ message: 'User already exists' });
@@ -23,7 +27,6 @@ exports.register = async (req, res) => {
 
         let facultyId = null;
         if (user.role === 'teacher') {
-            const Faculty = require('../models/Faculty');
             const fac = await Faculty.findOne({ userId: user._id });
             if (fac) facultyId = fac._id;
         }
@@ -36,7 +39,7 @@ exports.register = async (req, res) => {
                 role: user.role,
                 name: user.name,
                 email: user.email,
-                facultyId: facultyId
+                facultyId,
             }
         });
     } catch (err) {
@@ -49,19 +52,21 @@ exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // Find user
+        if (!username || !password) {
+            return res.status(400).json({ message: 'Username and password are required' });
+        }
+
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+            // Use same message for missing user and wrong password to prevent user enumeration
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        // Check password
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        // Create token
         const token = jwt.sign(
             { id: user._id, role: user.role },
             process.env.JWT_SECRET,
@@ -70,7 +75,6 @@ exports.login = async (req, res) => {
 
         let facultyId = null;
         if (user.role === 'teacher') {
-            const Faculty = require('../models/Faculty');
             const fac = await Faculty.findOne({ userId: user._id });
             if (fac) facultyId = fac._id;
         }
@@ -84,7 +88,7 @@ exports.login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 department: user.department,
-                facultyId: facultyId
+                facultyId,
             }
         });
     } catch (err) {

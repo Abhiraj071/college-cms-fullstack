@@ -56,10 +56,6 @@ export class Login {
                     <span style="font-size: 0.70rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; width: 100%; text-align: center;">Demo Access</span>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <button type="button" onclick="document.getElementById('username').value='admin'; document.getElementById('password').value='admin123';" style="padding: 10px; background: var(--bg-primary); border: 1px solid var(--glass-border); border-radius: 6px; text-align: left; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--text-secondary)'" onmouseout="this.style.borderColor='var(--glass-border)'">
-                        <div style="font-size: 0.7rem; color: var(--text-primary); font-weight: 600; margin-bottom: 2px;">Admin</div>
-                        <code style="font-size: 0.75rem; color: var(--text-secondary); background: transparent; padding: 0;">admin123</code>
-                    </button>
                     <button type="button" onclick="document.getElementById('username').value='student'; document.getElementById('password').value='password';" style="padding: 10px; background: var(--bg-primary); border: 1px solid var(--glass-border); border-radius: 6px; text-align: left; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--text-secondary)'" onmouseout="this.style.borderColor='var(--glass-border)'">
                         <div style="font-size: 0.7rem; color: var(--text-primary); font-weight: 600; margin-bottom: 2px;">Student</div>
                         <code style="font-size: 0.75rem; color: var(--text-secondary); background: transparent; padding: 0;">password</code>

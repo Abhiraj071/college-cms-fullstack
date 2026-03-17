@@ -10,6 +10,7 @@ exports.getStudyMaterials = async (req, res) => {
         const materials = await StudyMaterial.find(query)
             .populate('subject', 'name')
             .populate('faculty', 'name')
+            .lean()
             .sort({ createdAt: -1 });
         res.json(materials);
     } catch (err) {

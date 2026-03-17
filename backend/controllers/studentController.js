@@ -1,12 +1,20 @@
 const Student = require('../models/Student');
 const User = require('../models/User');
+const crypto = require('crypto');
+
+// Generate a secure random default password
+function generateDefaultPassword() {
+    return crypto.randomBytes(10).toString('base64url'); // e.g. "aB3xR9mK2p"
+}
 
 // Get all students
 exports.getStudents = async (req, res) => {
     try {
         const { userId } = req.query;
         const query = userId ? { userId } : {};
-        const students = await Student.find(query).populate('userId', 'username email');
+        const students = await Student.find(query)
+            .populate('userId', 'username email')
+            .lean();     // lean() returns plain JS objects – faster, less memory
         res.json(students);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -17,6 +25,10 @@ exports.getStudents = async (req, res) => {
 exports.createStudent = async (req, res) => {
     try {
         const { username, email, name, rollNo, course, semester, phone, joinDate } = req.body;
+
+        if (!username || !email || !name || !rollNo || !course || !semester) {
+            return res.status(400).json({ message: 'username, email, name, rollNo, course and semester are required' });
+        }
 
         // 1. Check if user already exists
         let userInstance = await User.findOne({ $or: [{ username }, { email }] });
@@ -30,10 +42,12 @@ exports.createStudent = async (req, res) => {
             return res.status(400).json({ message: 'Roll number already exists' });
         }
 
+        const defaultPassword = generateDefaultPassword();
+
         // 3. Create User Account
         userInstance = new User({
             username,
-            password: 'password123', // Default password
+            password: defaultPassword,
             role: 'student',
             name,
             email
@@ -43,18 +57,13 @@ exports.createStudent = async (req, res) => {
         // 4. Create Student Record
         const student = new Student({
             userId: userInstance._id,
-            name,
-            rollNo,
-            course,
-            semester,
-            email,
-            phone,
-            joinDate,
+            name, rollNo, course, semester, email, phone, joinDate,
             cgpa: 0.0
         });
         await student.save();
 
-        res.status(201).json(student);
+        // Return generated password once so admin can share it with student
+        res.status(201).json({ ...student.toObject(), defaultPassword });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -67,44 +76,37 @@ exports.deleteStudent = async (req, res) => {
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
-
-        // Delete associated user account
         await User.findByIdAndDelete(student.userId);
-        // Delete student record
         await Student.findByIdAndDelete(req.params.id);
-
         res.json({ message: 'Student deleted successfully' });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
+
 // Update student (Admin only)
 exports.updateStudent = async (req, res) => {
     try {
         const { name, rollNo, course, semester, phone, email } = req.body;
-
         const student = await Student.findById(req.params.id);
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
 
-        // Update Student Record
-        student.name = name || student.name;
-        student.rollNo = rollNo || student.rollNo;
-        student.course = course || student.course;
-        student.semester = semester || student.semester;
-        student.phone = phone || student.phone;
-        student.email = email || student.email;
+        if (name)     student.name = name;
+        if (rollNo)   student.rollNo = rollNo;
+        if (course)   student.course = course;
+        if (semester) student.semester = semester;
+        if (phone)    student.phone = phone;
+        if (email)    student.email = email;
         await student.save();
 
-        // Update Associated User
         if (student.userId) {
             await User.findByIdAndUpdate(student.userId, {
                 name: student.name,
                 email: student.email
             });
         }
-
         res.json(student);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -120,60 +122,49 @@ exports.createBulkStudents = async (req, res) => {
             return res.status(400).json({ message: 'No students provided' });
         }
 
-        const results = {
-            success: 0,
-            failed: 0,
-            errors: []
-        };
+        const results = { success: 0, failed: 0, errors: [], createdStudents: [] };
 
         for (const studentData of students) {
             try {
                 const { name, rollNo, email, phone } = studentData;
-                const username = rollNo; // Roll number is the username
+                const username = rollNo;
 
-                // 1. Check if user already exists
                 let userInstance = await User.findOne({ $or: [{ username }, { email }] });
                 if (userInstance) {
                     results.failed++;
-                    results.errors.push(`Student ${name} (${rollNo}): User or Email already exists`);
+                    results.errors.push(`${name} (${rollNo}): User or Email already exists`);
                     continue;
                 }
 
-                // 2. Check if roll number exists
                 const rollExists = await Student.findOne({ rollNo });
                 if (rollExists) {
                     results.failed++;
-                    results.errors.push(`Student ${name} (${rollNo}): Roll number already exists`);
+                    results.errors.push(`${name} (${rollNo}): Roll number already exists`);
                     continue;
                 }
 
-                // 3. Create User Account
+                const defaultPassword = generateDefaultPassword();
                 userInstance = new User({
                     username,
-                    password: 'password123', // Default password
+                    password: defaultPassword,
                     role: 'student',
                     name,
                     email
                 });
                 await userInstance.save();
 
-                // 4. Create Student Record
                 const student = new Student({
                     userId: userInstance._id,
-                    name,
-                    rollNo,
-                    course,
-                    semester,
-                    email,
-                    phone,
+                    name, rollNo, course, semester, email, phone,
                     joinDate: joinDate || new Date(),
                     cgpa: 0.0
                 });
                 await student.save();
                 results.success++;
+                results.createdStudents.push({ rollNo, name, defaultPassword });
             } catch (err) {
                 results.failed++;
-                results.errors.push(`Student ${studentData.name || 'Unknown'}: ${err.message}`);
+                results.errors.push(`${studentData.name || 'Unknown'}: ${err.message}`);
             }
         }
 

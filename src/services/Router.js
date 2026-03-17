@@ -28,6 +28,8 @@ import { SubjectForm } from '../components/modules/subjects/SubjectForm.js';
 import { AssignmentList } from '../components/modules/assignments/AssignmentList.js';
 import { StudyMaterialList } from '../components/modules/study-materials/StudyMaterialList.js';
 
+import { AcademicCalendar }   from '../components/modules/calendar/AcademicCalendar.js';
+
 const ALL = [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT];
 const STAFF = [ROLES.ADMIN, ROLES.TEACHER];
 
@@ -81,7 +83,10 @@ export class Router {
 
             // Reports & Settings
             [ROUTES.REPORTS]: { roles: STAFF, component: ReportCenter },
-            [ROUTES.SETTINGS]: { roles: [ROLES.ADMIN], component: Settings }
+            [ROUTES.SETTINGS]: { roles: [ROLES.ADMIN], component: Settings },
+
+            // ── New Feature Routes ──────────────────────────────────────────
+            [ROUTES.CALENDAR]:     { roles: ALL,              component: AcademicCalendar },
         };
     }
 

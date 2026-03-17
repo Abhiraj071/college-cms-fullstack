@@ -140,7 +140,7 @@ export class FacultyForm {
                         ...data,
                         joinDate: new Date().toISOString().split('T')[0]
                     });
-                    Toast.success('Faculty Added Successfully! Default Password: faculty123');
+                    Toast.success(`Faculty Added Successfully! Default Password: ${response.defaultPassword || '(see admin console)'}`);
                 }
                 window.location.hash = ROUTES.FACULTY_LIST;
             } catch (err) {

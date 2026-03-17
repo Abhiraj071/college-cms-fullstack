@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const path = require('path');
-const fs = require('fs');
 
 exports.exportBackup = async (req, res) => {
     try {
@@ -8,12 +6,9 @@ exports.exportBackup = async (req, res) => {
         const backupData = {};
 
         for (const col of collections) {
-            const collectionName = col.name;
-            // Skip system collections if any
-            if (collectionName.startsWith('system.')) continue;
-
-            const data = await mongoose.connection.db.collection(collectionName).find({}).toArray();
-            backupData[collectionName] = data;
+            const name = col.name;
+            if (name.startsWith('system.')) continue;
+            backupData[name] = await mongoose.connection.db.collection(name).find({}).toArray();
         }
 
         res.json({
@@ -30,64 +25,66 @@ exports.exportBackup = async (req, res) => {
 
 exports.importBackup = async (req, res) => {
     try {
-        const { backupData } = req.body;
-        if (!backupData) {
-            return res.status(400).json({ message: 'No backup data provided' });
+        let backupData = req.body.backupData;
+        if (!backupData || typeof backupData !== 'object') {
+            return res.status(400).json({ message: 'No valid backup data provided' });
         }
 
-        // 1. Clear current database
-        const collections = await mongoose.connection.db.listCollections().toArray();
-        for (const col of collections) {
+        // Handle exports from the app's own /api/system/export endpoint,
+        // which wraps collections under a { success, timestamp, version, data: {...} } envelope
+        if (backupData.data && typeof backupData.data === 'object' && !Array.isArray(backupData.data)) {
+            backupData = backupData.data;
+        }
+
+        // Clear current database (non-system collections)
+        const existing = await mongoose.connection.db.listCollections().toArray();
+        for (const col of existing) {
             if (col.name.startsWith('system.')) continue;
             await mongoose.connection.db.collection(col.name).deleteMany({});
         }
 
-        // Helper function to recursively convert valid hex strings to ObjectIDs
         const convertToObjectId = (obj) => {
             if (obj === null || typeof obj !== 'object') {
-                // If it's a string and looks like a 24-char hex ObjectId, try converting it
                 if (typeof obj === 'string' && /^[0-9a-fA-F]{24}$/.test(obj)) {
-                    return new mongoose.Types.ObjectId(obj);
+                    try { return new mongoose.Types.ObjectId(obj); } catch { return obj; }
                 }
                 return obj;
             }
+            if (Array.isArray(obj)) return obj.map(convertToObjectId);
 
-            if (Array.isArray(obj)) {
-                return obj.map(item => convertToObjectId(item));
-            }
-
-            const newObj = {};
-            for (const key in obj) {
-                if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                    // Dates might also need conversion if they came back as strings
-                    if (typeof obj[key] === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(obj[key])) {
-                        newObj[key] = new Date(obj[key]);
-                    } else if (key === '_id' && typeof obj[key] === 'string') {
-                        // Always convert _id
-                        newObj[key] = new mongoose.Types.ObjectId(obj[key]);
-                    } else {
-                        newObj[key] = convertToObjectId(obj[key]);
-                    }
+            const out = {};
+            for (const [key, val] of Object.entries(obj)) {
+                if (key === '_id' && typeof val === 'string') {
+                    try { out[key] = new mongoose.Types.ObjectId(val); } catch { out[key] = val; }
+                } else if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(val)) {
+                    out[key] = new Date(val);
+                } else {
+                    out[key] = convertToObjectId(val);
                 }
             }
-            return newObj;
+            return out;
         };
 
-        // 2. Import data
+        let restoredCollections = 0;
+        let restoredDocuments = 0;
+
         for (const [collectionName, documents] of Object.entries(backupData)) {
-            if (documents.length > 0) {
-                const processedDocs = documents.map(doc => convertToObjectId(doc));
-                await mongoose.connection.db.collection(collectionName).insertMany(processedDocs);
-            }
+            if (!Array.isArray(documents) || documents.length === 0) continue;
+            const processed = documents.map(convertToObjectId);
+            await mongoose.connection.db.collection(collectionName).insertMany(processed, { ordered: false });
+            restoredCollections++;
+            restoredDocuments += processed.length;
         }
 
-        res.json({ success: true, message: 'System restored successfully' });
+        res.json({
+            success: true,
+            message: `System restored successfully. ${restoredCollections} collections, ${restoredDocuments} documents imported.`
+        });
     } catch (err) {
         console.error('Import Error:', err);
         res.status(500).json({ message: 'Failed to restore backup: ' + err.message });
     }
 };
-
 
 exports.getSystemStats = async (req, res) => {
     try {
@@ -95,18 +92,18 @@ exports.getSystemStats = async (req, res) => {
         let totalRecords = 0;
         const collectionStats = [];
 
-        for (const col of collections) {
-            if (col.name.startsWith('system.')) continue;
-            const count = await mongoose.connection.db.collection(col.name).countDocuments();
-            totalRecords += count;
-            collectionStats.push({ name: col.name, count });
-        }
+        // Run all countDocuments in parallel for speed
+        await Promise.all(
+            collections
+                .filter(col => !col.name.startsWith('system.'))
+                .map(async col => {
+                    const count = await mongoose.connection.db.collection(col.name).countDocuments();
+                    totalRecords += count;
+                    collectionStats.push({ name: col.name, count });
+                })
+        );
 
-        res.json({
-            totalRecords,
-            collections: collectionStats,
-            dbName: mongoose.connection.name
-        });
+        res.json({ totalRecords, collections: collectionStats, dbName: mongoose.connection.name });
     } catch (err) {
         res.status(500).json({ message: 'Failed to fetch stats' });
     }
@@ -115,30 +112,23 @@ exports.getSystemStats = async (req, res) => {
 exports.factoryReset = async (req, res) => {
     try {
         const collections = await mongoose.connection.db.listCollections().toArray();
-        let deletedCounts = {};
+        const deletedCounts = {};
 
         for (const col of collections) {
-            const collectionName = col.name;
-            if (collectionName.startsWith('system.')) continue;
-
-            if (collectionName === 'users') {
-                // Delete everything except admin users
-                const result = await mongoose.connection.db.collection(collectionName).deleteMany({ role: { $ne: 'admin' } });
-                deletedCounts[collectionName] = result.deletedCount;
-            } else {
-                // Delete all documents in other collections
-                const result = await mongoose.connection.db.collection(collectionName).deleteMany({});
-                deletedCounts[collectionName] = result.deletedCount;
-            }
+            const name = col.name;
+            if (name.startsWith('system.')) continue;
+            const filter = name === 'users' ? { role: { $ne: 'admin' } } : {};
+            const result = await mongoose.connection.db.collection(name).deleteMany(filter);
+            deletedCounts[name] = result.deletedCount;
         }
 
         res.json({
             success: true,
-            message: 'Factory reset completed successfully. All non-admin data has been removed.',
+            message: 'Factory reset completed. All non-admin data removed.',
             deletedCounts
         });
     } catch (err) {
         console.error('Factory Reset Error:', err);
-        res.status(500).json({ success: false, message: 'Failed to perform factory reset', error: err.message });
+        res.status(500).json({ success: false, message: 'Failed to perform factory reset' });
     }
 };

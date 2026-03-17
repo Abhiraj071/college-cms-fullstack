@@ -237,7 +237,7 @@ export class StudentForm {
                         ...data,
                         semester: parseInt(String(data.semester))
                     });
-                    Toast.success('Student Registered Successfully! Default Password: password123');
+                    Toast.success(`Student Registered Successfully! Default Password: ${response.defaultPassword || '(see admin console)'}`);
                 }
                 window.location.hash = ROUTES.STUDENTS_LIST;
             } catch (err) {

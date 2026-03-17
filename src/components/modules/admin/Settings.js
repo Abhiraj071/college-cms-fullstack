@@ -65,6 +65,51 @@ export class Settings {
         `;
         content.appendChild(infoCard);
 
+
+        // ── Email Notifications Card ──────────────────────────────────────
+        const emailCard = this.createCard('📧 Email Notifications', 'Send attendance alerts and system emails');
+        emailCard.innerHTML += `
+            <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:1rem;">
+                <p style="font-size:0.82rem;color:var(--text-secondary);margin:0;">
+                    Configure SMTP settings in <code style="background:var(--bg-primary);padding:2px 5px;border-radius:4px;">backend/.env</code> to enable email.
+                </p>
+                <button id="send-low-att-emails" class="glass-button" style="background:rgba(245,158,11,0.1)!important;color:var(--warning)!important;border:1px solid rgba(245,158,11,0.3)!important;">
+                    ⚠️ Send Low Attendance Alerts
+                </button>
+                <div id="email-status" style="font-size:0.8rem;color:var(--text-secondary);"></div>
+            </div>
+        `;
+        emailCard.querySelector('#send-low-att-emails').addEventListener('click', async (e) => {
+            const btn = e.target;
+            const status = emailCard.querySelector('#email-status');
+            btn.disabled = true; btn.textContent = '📧 Sending…';
+            try {
+                const r = await ApiService.sendLowAttendanceAlerts();
+                status.textContent = r.message;
+                status.style.color = 'var(--success)';
+                Toast.success(r.message);
+            } catch (err) {
+                status.textContent = err.message;
+                status.style.color = 'var(--danger)';
+                Toast.error('Email failed: ' + err.message);
+            } finally {
+                btn.disabled = false; btn.textContent = '⚠️ Send Low Attendance Alerts';
+            }
+        });
+        content.appendChild(emailCard);
+
+        // ── Activity Log Quick Link ───────────────────────────────────────
+        const logCard = this.createCard('🕵️ Activity Log', 'Audit all system actions and data changes');
+        logCard.innerHTML += `
+            <div style="margin-top:1rem;">
+                <p style="font-size:0.82rem;color:var(--text-secondary);margin:0 0 0.75rem;">
+                    Track every student creation, attendance mark, login, and system change.
+                </p>
+                <button class="glass-button" onclick="window.location.hash='activity-log'">View Activity Log →</button>
+            </div>
+        `;
+        content.appendChild(logCard);
+
         container.appendChild(content);
 
         // Event Listeners

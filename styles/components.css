@@ -182,3 +182,58 @@ span[style*="border-radius: 20px"] {
         transform: translateY(0);
     }
 }
+/* ─── Feature Additions ──────────────────────────────────────────────────── */
+
+/* Skeleton loader pulse */
+@keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+}
+.skeleton-pulse {
+    background: var(--glass-border) !important;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* Search result rows */
+.gs-row:hover { background: var(--bg-primary) !important; }
+
+/* Notification badge */
+#notif-badge { display: flex; }
+
+/* Smooth page fade-in */
+.fade-in {
+    animation: fadeInUp 0.3s ease;
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Calendar day hover */
+.cal-day:hover { opacity: 0.85; }
+
+/* Mobile: hide search label on small screens */
+@media (max-width: 640px) {
+    nav button[title="Global Search (Ctrl+K)"] { min-width: auto !important; }
+    nav button[title="Global Search (Ctrl+K)"] span:last-child { display: none; }
+    nav button[title="Global Search (Ctrl+K)"] span:first-child span { display: none; }
+}
+
+/* Better table hover */
+tbody tr:hover { background: var(--bg-primary); transition: background 0.15s; }
+
+/* Code blocks in API docs */
+code { font-family: 'Menlo', 'Monaco', 'Courier New', monospace; }
+
+/* Responsive 2-col grid fallback */
+@media (max-width: 768px) {
+    [style*="grid-template-columns: 1fr 1fr"],
+    [style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+    [style*="grid-template-columns: 1fr 300px"],
+    [style*="grid-template-columns:1fr 300px"] {
+        grid-template-columns: 1fr !important;
+    }
+}

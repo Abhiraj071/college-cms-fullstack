@@ -10,7 +10,7 @@ exports.getSubjects = async (req, res) => {
         if (semester) query.semester = parseInt(semester);
         if (req.query.faculty) query.faculty = req.query.faculty;
 
-        const subjects = await Subject.find(query).populate('faculty');
+        const subjects = await Subject.find(query).populate('faculty').lean();
         res.json(subjects);
     } catch (err) {
         res.status(500).json({ message: err.message });

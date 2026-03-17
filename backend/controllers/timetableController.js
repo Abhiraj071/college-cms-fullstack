@@ -7,7 +7,7 @@ exports.getTimetables = async (req, res) => {
         if (req.query.year) query.year = Number(req.query.year);
         if (req.query.semester) query.semester = Number(req.query.semester);
 
-        const timetables = await Timetable.find(query);
+        const timetables = await Timetable.find(query).lean();
         res.json(timetables);
     } catch (err) {
         res.status(500).json({ message: err.message });

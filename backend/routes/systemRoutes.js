@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const systemController = require('../controllers/systemController');
-const { protect } = require('../middleware/authMiddleware');
+// Note: protect + authorize('admin') is already applied in server.js for /api/system
 
-// All system routes require admin role (not strictly enforced here but usually handled by middleware)
-router.get('/export', protect, systemController.exportBackup);
-router.post('/import', protect, systemController.importBackup);
-router.get('/stats', protect, systemController.getSystemStats);
-router.post('/reset', protect, systemController.factoryReset);
+router.get('/export', systemController.exportBackup);
+router.post('/import', systemController.importBackup);
+router.get('/stats', systemController.getSystemStats);
+router.post('/reset', systemController.factoryReset);
 
 module.exports = router;

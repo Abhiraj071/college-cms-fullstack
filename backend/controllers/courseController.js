@@ -4,7 +4,7 @@ const Branch = require('../models/Branch');
 // --- Branches ---
 exports.getBranches = async (req, res) => {
     try {
-        const branches = await Branch.find();
+        const branches = await Branch.find().lean();
         res.json(branches);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -33,7 +33,7 @@ exports.deleteBranch = async (req, res) => {
 // --- Courses ---
 exports.getCourses = async (req, res) => {
     try {
-        const courses = await Course.find().populate('branches');
+        const courses = await Course.find().populate('branches').lean();
         res.json(courses);
     } catch (err) {
         res.status(500).json({ message: err.message });

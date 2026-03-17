@@ -370,4 +370,44 @@ export class ApiService {
             method: 'POST'
         });
     }
+
+    // ── Analytics ─────────────────────────────────────────────────────────────
+    static async getAnalyticsSummary() {
+        return await this.request('/analytics/summary');
+    }
+    static async getAttendanceAnalytics() {
+        return await this.request('/analytics/attendance');
+    }
+    static async getSubjectAnalytics() {
+        return await this.request('/analytics/subjects');
+    }
+
+    // ── Global Search ─────────────────────────────────────────────────────────
+    static async globalSearch(q) {
+        return await this.request(`/search?q=${encodeURIComponent(q)}`);
+    }
+
+    // ── Activity Log ──────────────────────────────────────────────────────────
+    static async getActivityLogs({ page = 1, limit = 50, category = '' } = {}) {
+        let url = `/activity-log?page=${page}&limit=${limit}`;
+        if (category) url += `&category=${category}`;
+        return await this.request(url);
+    }
+    static async createActivityLog(action, category, details = {}) {
+        return await this.request('/activity-log', {
+            method: 'POST',
+            body: JSON.stringify({ action, category, details }),
+        });
+    }
+
+    static async getAnalyticsPredictions() {
+        return await this.request('/analytics/predictions');
+    }
+    static async sendLowAttendanceAlerts(threshold = 0.75) {
+        return await this.request('/email/low-attendance', {
+            method: 'POST',
+            body: JSON.stringify({ threshold }),
+        });
+    }
+
 }

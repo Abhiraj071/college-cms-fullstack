@@ -1,4 +1,5 @@
 import { storage } from '../services/StorageService.js';
+import { PollingService } from '../services/PollingService.js';
 import { auth } from '../services/AuthService.js';
 
 export class Dashboard {
@@ -48,11 +49,20 @@ export class Dashboard {
         // 2. Stats Grid
         const grid = document.createElement('div');
         grid.style.display = 'grid';
-        grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(240px, 1fr))';
+        grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(200px, 1fr))';
         grid.style.gap = '1.25rem';
         grid.innerHTML = '<div style="grid-column: span 3; padding: 2rem; text-align: center;">Loading Fresh Analytics...</div>';
         this.updateDashboardStats(grid, user);
         content.appendChild(grid);
+
+        // ── Real-time polling (every 30 s) ────────────────────────────────
+        this._stopPoll = PollingService.start('dashboard', 30_000, () => {
+            this.updateDashboardStats(grid, user);
+        });
+        // Stop polling when user navigates away
+        window.addEventListener('hashchange', () => {
+            if (this._stopPoll) this._stopPoll();
+        }, { once: true });
 
         // 3. Main Body Split
         const body = document.createElement('div');
@@ -62,8 +72,14 @@ export class Dashboard {
         body.style.marginTop = 'var(--space-md)';
 
         if (window.innerWidth > 1024) {
-            body.style.gridTemplateColumns = '1.2fr 0.8fr';
+            body.style.gridTemplateColumns = user.role === 'admin' ? '1fr 1fr' : '1.2fr 0.8fr';
         }
+
+        // Right Side: Announcements & Upcoming
+        const rightSide = document.createElement('div');
+        rightSide.style.display = 'flex';
+        rightSide.style.flexDirection = 'column';
+        rightSide.style.gap = '1.5rem';
 
         // Left Side: Schedule & Tasks
         const leftSide = document.createElement('div');
@@ -79,13 +95,9 @@ export class Dashboard {
         } else {
             leftSide.appendChild(this.renderAdminQuickActions());
             leftSide.appendChild(this.renderSystemOverview());
+            leftSide.appendChild(this.renderEnrollmentChart());
+            rightSide.appendChild(this.renderLowAttendanceStudents());
         }
-
-        // Right Side: Announcements & Upcoming
-        const rightSide = document.createElement('div');
-        rightSide.style.display = 'flex';
-        rightSide.style.flexDirection = 'column';
-        rightSide.style.gap = '1.5rem';
 
         rightSide.appendChild(this.renderAnnouncements());
 
@@ -98,8 +110,31 @@ export class Dashboard {
 
     async updateDashboardStats(container, user) {
         const role = user.role;
-        const cardStyle = 'padding: 1.5rem; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;';
-        const bgGlow = (color) => `<div style="position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: ${color}; filter: blur(50px); opacity: 0.1; border-radius: 50%;"></div>`;
+        const cardStyle = (borderColor) => `
+            padding: 1.75rem 1.5rem 1.5rem;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.6rem;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            border-top: 4px solid ${borderColor};
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: default;
+        `.replace(/\s+/g, ' ').trim();
+        const statCard = (icon, label, value, borderColor, numColor) => `
+            <div class="glass-panel stat-card" style="${cardStyle(borderColor)}"
+                 onmouseenter="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'"
+                 onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)'">
+                <div style="font-size: 2.4rem; line-height: 1;">${icon}</div>
+                <div style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-top: 0.25rem;">${label}</div>
+                <div style="font-size: 2.6rem; font-weight: 800; color: ${numColor}; line-height: 1.1;">${value}</div>
+            </div>
+        `;
 
         try {
             const { ApiService } = await import('../services/ApiService.js');
@@ -153,24 +188,9 @@ export class Dashboard {
                 }
 
                 statsHtml = `
-                    <div class="glass-panel" style="${cardStyle} border-left: 4px solid var(--accent-color);">
-                        ${bgGlow('var(--accent-color)')}
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📚</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Active Subjects</div>
-                        <div style="font-size: 2.4rem; font-weight: 800;">${activeSubjectsCount}</div>
-                    </div>
-                    <div class="glass-panel" style="${cardStyle} border-left: 4px solid var(--success);">
-                        ${bgGlow('var(--success)')}
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📅</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Attendance</div>
-                        <div style="font-size: 2.4rem; font-weight: 800;">${attendancePct}</div>
-                    </div>
-                    <div class="glass-panel" style="${cardStyle} border-left: 4px solid var(--warning);">
-                        ${bgGlow('var(--warning)')}
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📝</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Pending Tasks</div>
-                        <div style="font-size: 2.4rem; font-weight: 800;">${pendingAssignmentsCount}</div>
-                    </div>
+                    ${statCard('📚', 'Active Subjects', activeSubjectsCount, '#6366f1', '#6366f1')}
+                    ${statCard('📅', 'Attendance', attendancePct, '#10b981', '#10b981')}
+                    ${statCard('📝', 'Pending Tasks', pendingAssignmentsCount, '#f59e0b', '#f59e0b')}
                 `;
             } else if (role === 'teacher') {
                 const [subjects, assignments, timetables] = await Promise.all([
@@ -202,51 +222,23 @@ export class Dashboard {
                 const pendingGradesCount = assignments.filter(a => a.submissions.some(s => !s.grade)).length;
 
                 statsHtml = `
-                    <div class="glass-panel" style="${cardStyle} border-left: 4px solid var(--accent-color);">
-                        ${bgGlow('var(--accent-color)')}
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏫</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">My Classes</div>
-                        <div style="font-size: 2.4rem; font-weight: 800;">${mySubjects.length}</div>
-                    </div>
-                    <div class="glass-panel" style="${cardStyle} border-left: 4px solid var(--success);">
-                        ${bgGlow('var(--success)')}
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🕒</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Classes Today</div>
-                        <div style="font-size: 2.4rem; font-weight: 800;">${todayClassesCount}</div>
-                    </div>
-                    <div class="glass-panel" style="${cardStyle} border-left: 4px solid var(--warning);">
-                        ${bgGlow('var(--warning)')}
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✍️</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Ungraded Tasks</div>
-                        <div style="font-size: 2.4rem; font-weight: 800;">${pendingGradesCount}</div>
-                    </div>
+                    ${statCard('🏫', 'My Classes', mySubjects.length, '#6366f1', '#6366f1')}
+                    ${statCard('🕒', 'Classes Today', todayClassesCount, '#10b981', '#10b981')}
+                    ${statCard('✍️', 'Ungraded Tasks', pendingGradesCount, '#f59e0b', '#f59e0b')}
                 `;
             } else {
-                const [students, faculty, courses] = await Promise.all([
+                const [students, faculty, courses, subjects] = await Promise.all([
                     ApiService.getStudents(),
                     ApiService.getFaculty(),
-                    ApiService.getCourses()
+                    ApiService.getCourses(),
+                    ApiService.getSubjects()
                 ]);
 
                 statsHtml = `
-                    <div class="glass-panel" style="${cardStyle} border-left: 4px solid var(--accent-color);">
-                        ${bgGlow('var(--accent-color)')}
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👨‍🎓</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Total Students</div>
-                        <div style="font-size: 2.4rem; font-weight: 800;">${students.length}</div>
-                    </div>
-                    <div class="glass-panel" style="${cardStyle} border-left: 4px solid var(--success);">
-                        ${bgGlow('var(--success)')}
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👨‍🏫</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Faculty Base</div>
-                        <div style="font-size: 2.4rem; font-weight: 800;">${faculty.length}</div>
-                    </div>
-                    <div class="glass-panel" style="${cardStyle} border-left: 4px solid var(--warning);">
-                        ${bgGlow('var(--warning)')}
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📚</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Offered Courses</div>
-                        <div style="font-size: 2.4rem; font-weight: 800;">${courses.length}</div>
-                    </div>
+                    ${statCard('👨‍🎓', 'Students', students.length, '#6366f1', '#6366f1')}
+                    ${statCard('👩‍🏫', 'Faculty', faculty.length, '#10b981', '#10b981')}
+                    ${statCard('📚', 'Courses', courses.length, '#f59e0b', '#f59e0b')}
+                    ${statCard('📖', 'Subjects', subjects.length, '#8b5cf6', '#8b5cf6')}
                 `;
             }
 
@@ -519,6 +511,160 @@ export class Dashboard {
             `;
         } catch (e) {
             container.innerHTML = '<p style="color:red; font-size:0.8rem;">Data error</p>';
+        }
+    }
+
+    renderEnrollmentChart() {
+        const div = document.createElement('div');
+        div.className = 'glass-panel';
+        div.style.padding = '1.5rem';
+        div.innerHTML = `
+            <h3 style="margin: 0 0 1.25rem; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                🎓 Enrollment by Course
+            </h3>
+            <div style="position: relative; height: 260px; display: flex; align-items: center; justify-content: center;">
+                <canvas id="enrollmentDonutChart"></canvas>
+                <div id="enrollment-empty" style="display:none; color: var(--text-secondary); font-size: 0.9rem;">No enrollment data.</div>
+            </div>
+            <div id="enrollment-legend" style="display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 1rem; justify-content: center;"></div>
+        `;
+        this._loadEnrollmentChart(div);
+        return div;
+    }
+
+    async _loadEnrollmentChart(container) {
+        try {
+            const { ApiService } = await import('../services/ApiService.js');
+            const students = await ApiService.getStudents();
+
+            const counts = {};
+            students.forEach(s => {
+                if (s.course) counts[s.course] = (counts[s.course] || 0) + 1;
+            });
+            const labels = Object.keys(counts);
+            const data = Object.values(counts);
+
+            if (!labels.length) {
+                container.querySelector('#enrollment-empty').style.display = 'block';
+                container.querySelector('#enrollmentDonutChart').style.display = 'none';
+                return;
+            }
+
+            const palette = ['#6366f1','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#f97316','#84cc16'];
+
+            const waitForChart = (attempts = 0) => {
+                const canvas = container.querySelector('#enrollmentDonutChart');
+                if (!canvas) return;
+                if (window.Chart) {
+                    new window.Chart(canvas.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels,
+                            datasets: [{
+                                data,
+                                backgroundColor: palette.slice(0, labels.length),
+                                borderColor: '#fff',
+                                borderWidth: 3,
+                                hoverOffset: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '62%',
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => ` ${ctx.label}: ${ctx.raw} students`
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    // Custom legend
+                    const legend = container.querySelector('#enrollment-legend');
+                    if (legend) {
+                        legend.innerHTML = labels.map((label, i) => `
+                            <div style="display:flex; align-items:center; gap:6px; font-size:0.78rem; color: var(--text-secondary);">
+                                <span style="width:14px; height:14px; border-radius:3px; background:${palette[i % palette.length]}; flex-shrink:0; display:inline-block;"></span>
+                                ${label}
+                            </div>
+                        `).join('');
+                    }
+                } else if (attempts < 20) {
+                    setTimeout(() => waitForChart(attempts + 1), 300);
+                }
+            };
+            setTimeout(() => waitForChart(), 400);
+        } catch (e) {
+            console.error('Enrollment chart error', e);
+        }
+    }
+
+    renderLowAttendanceStudents() {
+        const div = document.createElement('div');
+        div.className = 'glass-panel';
+        div.style.padding = '1.5rem';
+        div.innerHTML = `
+            <h3 style="margin: 0 0 0.25rem; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                ⚠️ Low Attendance Students
+            </h3>
+            <p style="margin: 0 0 1rem; font-size: 0.82rem; color: var(--text-secondary);">Students below 75% threshold</p>
+            <div id="low-attendance-list" style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+                <p style="color: var(--text-secondary); font-size: 0.9rem; text-align:center; padding: 1rem 0;">Loading...</p>
+            </div>
+        `;
+        this._loadLowAttendanceStudents(div.querySelector('#low-attendance-list'));
+        return div;
+    }
+
+    async _loadLowAttendanceStudents(container) {
+        try {
+            const { ApiService } = await import('../services/ApiService.js');
+            const students = await ApiService.getStudents();
+
+            const low = students
+                .filter(s => {
+                    const pct = parseFloat(String(s.attendancePercentage || '0').replace('%',''));
+                    return pct > 0 && pct < 75;
+                })
+                .sort((a, b) => {
+                    const pa = parseFloat(String(a.attendancePercentage).replace('%',''));
+                    const pb = parseFloat(String(b.attendancePercentage).replace('%',''));
+                    return pa - pb;
+                });
+
+            if (!low.length) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding: 2rem 0;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin:0;">All students above 75% — great!</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = low.map(s => {
+                const pct = parseFloat(String(s.attendancePercentage || '0').replace('%',''));
+                const color = pct < 60 ? '#ef4444' : '#f59e0b';
+                return `
+                    <div style="display: flex; align-items: center; justify-content: space-between;
+                                padding: 0.85rem 1rem; background: var(--bg-secondary);
+                                border-radius: 10px; border: 1px solid var(--glass-border);">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 2px;">${s.name || s.userId?.name || 'Unknown'}</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">
+                                ${s.enrollmentNumber || s._id?.slice(-5) || '—'} · ${s.course || ''}
+                            </div>
+                        </div>
+                        <div style="font-size: 1.3rem; font-weight: 800; color: ${color}; flex-shrink:0; margin-left: 1rem;">
+                            ${Math.round(pct)}%
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (e) {
+            container.innerHTML = '<p style="color: var(--text-secondary); font-size:0.85rem;">Failed to load attendance data.</p>';
         }
     }
 

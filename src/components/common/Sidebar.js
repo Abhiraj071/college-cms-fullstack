@@ -99,6 +99,7 @@ export class Sidebar {
                 { href: `#${ROUTES.COURSES_LIST}`, label: 'Courses', icon: '📚' },
                 { href: `#${ROUTES.SUBJECTS_LIST}`, label: 'Subjects', icon: '📖' },
                 { href: `#${ROUTES.TIMETABLE}`, label: 'Timetable', icon: '📅' },
+                { href: `#${ROUTES.CALENDAR}`, label: 'Calendar', icon: '📆' },
                 { href: `#${ROUTES.REPORTS}`, label: 'Reports', icon: '📈' },
                 { href: `#${ROUTES.SETTINGS}`, label: 'Settings', icon: '⚙️' }
             ];
@@ -109,6 +110,7 @@ export class Sidebar {
                 { href: `#${ROUTES.TIMETABLE}`, label: 'Timetable', icon: '📅' },
                 { href: `#${ROUTES.ATTENDANCE}`, label: 'Attendance', icon: '✅' },
                 { href: `#${ROUTES.ASSIGNMENTS}`, label: 'Assignments', icon: '📝' },
+                { href: `#${ROUTES.CALENDAR}`, label: 'Calendar', icon: '📆' },
                 { href: `#${ROUTES.REPORTS}`, label: 'Reports', icon: '📈' }
             ];
         } else {
@@ -119,6 +121,7 @@ export class Sidebar {
                 { href: `#${ROUTES.TIMETABLE}`, label: 'Timetable', icon: '🕒' },
                 { href: `#${ROUTES.ATTENDANCE}`, label: 'Attendance', icon: '📅' },
                 { href: `#${ROUTES.ASSIGNMENTS}`, label: 'Assignments', icon: '📝' },
+                { href: `#${ROUTES.CALENDAR}`, label: 'Calendar', icon: '📆' },
             ];
         }
     }

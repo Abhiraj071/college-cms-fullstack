@@ -1,38 +1,34 @@
 const multer = require('multer');
 const path = require('path');
+const crypto = require('crypto');
 
-// Set storage engine
+const ALLOWED_EXTENSIONS = /jpeg|jpg|png|gif|pdf|doc|docx|ppt|pptx|txt|xls|xlsx|csv/;
+const ALLOWED_MIMETYPES = /image\/(jpeg|png|gif)|application\/(pdf|msword|vnd\.openxmlformats|vnd\.ms-(excel|powerpoint))|text\/(plain|csv)/;
+
 const storage = multer.diskStorage({
     destination: './uploads/',
-    filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    filename: (req, file, cb) => {
+        // Use random hex name to prevent path traversal & filename guessing
+        const randomName = crypto.randomBytes(16).toString('hex');
+        const ext = path.extname(file.originalname).toLowerCase();
+        cb(null, `${randomName}${ext}`);
     }
 });
 
-// Check file type
 function checkFileType(file, cb) {
-    // Allowed ext
-    const filetypes = /jpeg|jpg|png|gif|pdf|doc|docx|ppt|pptx|txt|zip|rar|xls|xlsx|csv/;
-    // Check ext
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    // Check mime
-    // We can be lenient with mime types as browser detection varies, mainly relying on extname for safety in this context
-    // const mimetype = filetypes.test(file.mimetype);
+    const extOk = ALLOWED_EXTENSIONS.test(path.extname(file.originalname).toLowerCase());
+    const mimeOk = ALLOWED_MIMETYPES.test(file.mimetype);
 
-    if (extname) {
+    if (extOk && mimeOk) {
         return cb(null, true);
-    } else {
-        cb('Error: Files/Images/Documents Only!');
     }
+    cb(new Error('Only allowed file types (images, PDFs, Office documents, CSVs) are permitted.'));
 }
 
-// Init upload
 const upload = multer({
-    storage: storage,
-    limits: { fileSize: 10000000 }, // 10MB limit
-    fileFilter: function (req, file, cb) {
-        checkFileType(file, cb);
-    }
+    storage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+    fileFilter: (req, file, cb) => checkFileType(file, cb),
 });
 
 module.exports = upload;

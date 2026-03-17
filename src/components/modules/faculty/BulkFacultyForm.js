@@ -250,7 +250,7 @@ export class BulkFacultyForm {
                     submitBtn.textContent = 'Register Batch';
                     submitBtn.disabled = false;
                 } else {
-                    Toast.success(`Successfully registered ${response.results.success} members. Default Password: faculty123`);
+                    Toast.success(`Successfully registered ${response.results.success} members. Check the response for individual passwords.`);
                     window.location.hash = ROUTES.FACULTY_LIST;
                 }
             } catch (err) {

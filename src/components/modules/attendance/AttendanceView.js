@@ -263,10 +263,10 @@ export class AttendanceView {
                     };
 
                     const isTaken = dateAttendance && dateAttendance.some(att => 
-                        att.course === item.course && 
+                        String(att.course).trim() === String(item.course).trim() && 
                         String(att.year) === String(item.year) && 
                         String(att.semester) === String(item.semester) && 
-                        att.subject === item.subject &&
+                        String(att.subject).trim() === String(item.subject).trim() &&
                         att.students && att.students.length > 0
                     );
 
@@ -317,11 +317,11 @@ export class AttendanceView {
         try {
             const [allStudents, existingRecords] = await Promise.all([
                 ApiService.getStudents(),
-                ApiService.getAttendance(this.selectedDate, course, year, semester, subject)
+                ApiService.getAttendance(this.selectedDate, course, String(year), String(semester), subject)
             ]);
 
             const students = allStudents.filter(s =>
-                s.course === course &&
+                String(s.course) === String(course) &&
                 String(s.semester) === String(semester)
             );
 
@@ -397,7 +397,10 @@ export class AttendanceView {
                 </thead>
                 <tbody>
                     ${students.map(s => {
-                const status = session?.students.find(sr => (sr.studentId?._id || sr.studentId) === s._id)?.status || 'Present';
+                const status = session?.students.find(sr => {
+                    const recId = (sr.studentId && typeof sr.studentId === 'object') ? sr.studentId._id : sr.studentId;
+                    return String(recId) === String(s._id);
+                })?.status || 'Present';
                 return `
                             <tr style="border-bottom: 1px solid var(--glass-border); transition: all 0.2s;">
                                 <td style="padding: 16px 24px; font-weight: 700; color: var(--text-secondary); font-family: monospace;">${s.rollNo}</td>
@@ -459,8 +462,8 @@ export class AttendanceView {
                     await ApiService.markAttendance({
                         date: this.selectedDate,
                         course: this.sessionDetails.course,
-                        year: this.sessionDetails.year,
-                        semester: this.sessionDetails.semester,
+                        year: String(this.sessionDetails.year),
+                        semester: String(this.sessionDetails.semester),
                         subject: this.sessionDetails.subject,
                         students: records
                     });
@@ -631,7 +634,10 @@ export class AttendanceView {
                 const subj = r.subject || 'General';
                 if (!subjectStats[subj]) subjectStats[subj] = { total: 0, present: 0 };
                 subjectStats[subj].total++;
-                const myRecord = r.students.find(s => String(s.studentId?._id || s.studentId) === profileId);
+                const myRecord = r.students.find(sr => {
+                    const recId = (sr.studentId && typeof sr.studentId === 'object') ? sr.studentId._id : sr.studentId;
+                    return String(recId) === String(profileId);
+                });
                 if (myRecord && myRecord.status === 'Present') subjectStats[subj].present++;
             });
 
@@ -692,7 +698,10 @@ export class AttendanceView {
                         key: 'students',
                         label: 'Status',
                         render: (v) => {
-                            const st = v.find(s => String(s.studentId?._id || s.studentId) === String(profile._id))?.status || 'Unknown';
+                            const st = v.find(sr => {
+                                const recId = (sr.studentId && typeof sr.studentId === 'object') ? sr.studentId._id : sr.studentId;
+                                return String(recId) === String(profile._id);
+                            })?.status || 'Unknown';
                             const colors = { 'Present': 'var(--success)', 'Absent': 'var(--danger)', 'Late': 'var(--warning)' };
                             const color = colors[st] || 'var(--text-secondary)';
                             return `<div style="display: flex; align-items: center; gap: 8px;">
