@@ -7,7 +7,7 @@ const facultySchema = new mongoose.Schema({
     phone:         String,
     department:    { type: String, required: true },
     designation:   { type: String, required: true },
-    qualification: { type: String, required: true },
+    qualification: { type: String, default: '' },
     joinDate:      { type: Date, default: Date.now }
 }, { timestamps: true });
 

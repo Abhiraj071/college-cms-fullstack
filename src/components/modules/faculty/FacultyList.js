@@ -52,7 +52,7 @@ export class FacultyList {
 
         deptSelect.innerHTML = `<option value="">Loading...</option>`;
         ApiService.getCourses().then(async (data) => {
-            deptSelect.innerHTML = `<option value="">Select Program / Dept</option>` +
+            deptSelect.innerHTML = `<option value="">All Departments</option>` +
                 data.map(c => `<option value="${c.name}">${c.name}</option>`).join('') +
                 `<option value="General">General Faculty</option>`;
 
@@ -68,7 +68,12 @@ export class FacultyList {
                 } catch (err) {
                     console.error('Student faculty filter error', err);
                 }
+            } else {
+                loadFaculty();
             }
+        }).catch(err => {
+            deptSelect.innerHTML = `<option value="">Failed to load departments</option>`;
+            Toast.error('Could not load programs: ' + err.message);
         });
 
         filterGroup.appendChild(deptSelect);
@@ -116,28 +121,20 @@ export class FacultyList {
         const loadFaculty = async () => {
             const selectedDept = deptSelect.value;
 
-            if (!selectedDept) {
-                tableCard.innerHTML = `
-                    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">👨‍🏫</div>
-                        <p>Please select a <strong>Program / Department</strong> to view faculty.</p>
-                    </div>
-                `;
-                return;
-            }
-
             tableCard.innerHTML = '<div style="padding: 2rem; text-align: center;">Loading faculty...</div>';
 
             try {
                 this.allFaculty = await ApiService.getFaculty();
-                const filtered = this.allFaculty.filter(f => f.department === selectedDept);
+                const filtered = selectedDept
+                    ? this.allFaculty.filter(f => f.department === selectedDept)
+                    : this.allFaculty;
 
                 tableCard.innerHTML = '';
 
                 if (filtered.length === 0) {
                     tableCard.innerHTML = `
                         <div style="text-align: center; padding: 2rem;">
-                            <p>No faculty found for ${selectedDept}</p>
+                            <p>No faculty found${selectedDept ? ' for ' + selectedDept : ''}.</p>
                         </div>
                     `;
                     return;

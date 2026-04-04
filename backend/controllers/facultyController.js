@@ -45,7 +45,7 @@ exports.createFaculty = async (req, res) => {
         const faculty = new Faculty({
             userId: userInstance._id,
             name, email, phone, department, designation,
-            qualification: req.body.qualification,
+            qualification: req.body.qualification || '',
             joinDate
         });
         await faculty.save();
