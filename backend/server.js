@@ -35,7 +35,7 @@ app.use('/api/faculty',         protect, require('./routes/facultyRoutes'));
 app.use('/api/courses',         protect, require('./routes/courseRoutes'));
 app.use('/api/subjects',        protect, require('./routes/subjectRoutes'));
 app.use('/api/attendance',      protect, require('./routes/attendanceRoutes'));
-app.use('/api/timetable',       protect, require('./routes/timetableRoutes'));
+app.use('/api/timetables',      protect, require('./routes/timetableRoutes'));
 app.use('/api/notices',         protect, require('./routes/noticeRoutes'));
 app.use('/api/assignments',     protect, require('./routes/assignmentRoutes'));
 app.use('/api/books',           protect, require('./routes/bookRoutes'));
@@ -44,6 +44,9 @@ app.use('/api/search',          protect, require('./routes/searchRoutes'));
 app.use('/api/upload',          protect, require('./routes/uploadRoutes'));
 app.use('/api/email',           protect, authorize('admin'), require('./routes/emailRoutes'));
 app.use('/api/system',          protect, authorize('admin'), require('./routes/systemRoutes'));
+app.use('/api/exams',           protect, require('./routes/examRoutes'));
+app.use('/api/analytics',       protect, require('./routes/analyticsRoutes'));
+app.use('/api/activity-log',    protect, require('./routes/activityLogRoutes'));
 
 // ─── Serve Frontend ───────────────────────────────────────────────────────────
 const frontendPath = path.join(__dirname, '..');
