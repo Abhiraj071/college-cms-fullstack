@@ -67,8 +67,10 @@ export class QRAttendance {
                 const sFacultyId = String(s.faculty?._id || s.faculty || '');
                 const uFacultyId = String(user.facultyId || '');
                 const uUserId = String(user.id || user._id || '');
+                const sFacultyName = s.faculty?.name || '';
+                const uName = user.name || '';
                 
-                return sFacultyId === uFacultyId || sFacultyId === uUserId;
+                return sFacultyId === uFacultyId || sFacultyId === uUserId || (sFacultyName && sFacultyName === uName);
             });
 
             subjectSelect.innerHTML = mySubjects.length > 0 

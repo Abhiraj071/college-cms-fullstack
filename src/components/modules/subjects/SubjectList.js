@@ -146,7 +146,8 @@ export class SubjectList {
                     const flattened = [];
                     this.subjects.forEach(s => {
                         const prim = s.faculty?._id || s.faculty;
-                        const isPrimary = (prim && user.facultyId && String(prim) === String(user.facultyId)) || (prim && String(prim) === String(user._id));
+                        const primName = s.faculty?.name || '';
+                        const isPrimary = (prim && user.facultyId && String(prim) === String(user.facultyId)) || (prim && String(prim) === String(user._id)) || (primName && primName === user.name);
                         const ctx = [];
                         this.timetables.forEach(t => { if(t.grid && Object.values(t.grid).some(slot => slot.subject === s.name && (slot.teacher === user.name || (user.facultyId && slot.teacher === String(user.facultyId)) || slot.teacher === user._id))) ctx.push({ course: t.course, year: t.year, semester: t.semester, timetableId: t._id }); });
                         if (ctx.length > 0) ctx.forEach(c => flattened.push({ ...s, ...c, _isContextual: true }));
