@@ -1,10 +1,11 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const User = require('./models/User');
 const Faculty = require('./models/Faculty');
 const Subject = require('./models/Subject');
 
 async function assign() {
-    await mongoose.connect('mongodb://localhost:27017/college_cms');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/college_cms');
     const user = await User.findOne({ name: 'Pooja Soni' });
     if (!user) {
         console.log('User not found');
