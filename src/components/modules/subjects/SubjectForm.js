@@ -58,6 +58,13 @@ export class SubjectForm {
                 </div>
 
                 <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.85rem; color: var(--text-secondary);">Assign Faculty (Optional)</label>
+                    <select name="faculty" id="facultySelect" class="glass-button" style="width: 100%; text-align: left; background: rgba(0,0,0,0.1); color: var(--text-primary);">
+                        <option value="">-- Unassigned --</option>
+                    </select>
+                </div>
+
+                <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.85rem; color: var(--text-secondary);">Description</label>
                     <textarea name="description" placeholder="A brief overview of this subject..." style="width: 100%; height: 120px; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: #fff;"></textarea>
                 </div>
@@ -74,6 +81,18 @@ export class SubjectForm {
 
         const initForm = async () => {
             try {
+                // Fetch and populate faculty list
+                const facultyList = await ApiService.getFaculty();
+                const facultySelect = form.querySelector('#facultySelect');
+                if (facultyList && facultyList.length > 0) {
+                    facultyList.forEach(f => {
+                        const option = document.createElement('option');
+                        option.value = f._id;
+                        option.textContent = f.name;
+                        facultySelect.appendChild(option);
+                    });
+                }
+
                 if (this.isEdit) {
                     const subjects = await ApiService.getSubjects();
                     this.subjectData = subjects.find(s => s._id === this.subjectId);
@@ -83,6 +102,11 @@ export class SubjectForm {
                         /** @type {HTMLInputElement} */ (form.querySelector('input[name="code"]')).value = this.subjectData.code || '';
                         /** @type {HTMLSelectElement} */ (form.querySelector('select[name="type"]')).value = this.subjectData.type;
                         /** @type {HTMLTextAreaElement} */ (form.querySelector('textarea[name="description"]')).value = this.subjectData.description || '';
+                        
+                        if (this.subjectData.faculty) {
+                            const facultyId = typeof this.subjectData.faculty === 'object' ? this.subjectData.faculty._id : this.subjectData.faculty;
+                            /** @type {HTMLSelectElement} */ (form.querySelector('select[name="faculty"]')).value = facultyId || '';
+                        }
                     } else {
                         Toast.error('Subject not found');
                         window.location.hash = ROUTES.SUBJECTS_LIST;
@@ -123,6 +147,11 @@ export class SubjectForm {
                 const payload = {
                     ...data
                 };
+                
+                // Don't send empty string for faculty (ObjectId casting error)
+                if (!payload.faculty) {
+                    delete payload.faculty;
+                }
 
                 if (this.isEdit) {
                     await ApiService.updateSubject(this.subjectId, payload);
