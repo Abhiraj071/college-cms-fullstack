@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Result Portal | College CMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="container">
+        <header class="fade-in">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">College<span>Portal</span></span>
+            </div>
+            <h1>Examination Result</h1>
+            <p>Enter your details below to check your official semester results.</p>
+        </header>
+
+        <main class="glass-card fade-in">
+            <form id="searchForm">
+                <div class="input-group">
+                    <label for="rollNo">Roll Number</label>
+                    <input type="text" id="rollNo" placeholder="e.g. 80301" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="examId">Examination</label>
+                    <select id="examId" required disabled>
+                        <option value="">Loading exams...</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="searchBtn" class="primary-btn">
+                    <span>Check Result</span>
+                    <div class="loader" id="btnLoader" style="display: none;"></div>
+                </button>
+            </form>
+
+            <div id="errorMsg" class="error-box" style="display: none;"></div>
+        </main>
+
+        <div id="resultContainer" class="result-container fade-in" style="display: none;">
+            <div class="glass-card result-card">
+                <div class="result-header">
+                    <div class="student-info">
+                        <h2 id="resStudentName">Student Name</h2>
+                        <p>Roll No: <span id="resRollNo"></span></p>
+                        <p>Course: <span id="resCourse"></span></p>
+                    </div>
+                    <div class="exam-info">
+                        <h3 id="resExamTitle">Exam Title</h3>
+                        <p>Semester: <span id="resSemester"></span></p>
+                        <p>Date: <span id="resDate"></span></p>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="marksTable">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Sessional</th>
+                                <th>Theory</th>
+                                <th>Viva</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marksBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="result-footer">
+                    <div class="summary">
+                        <div class="summary-item">
+                            <label>Grand Total</label>
+                            <span id="resGrandTotal">0/0</span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Percentage</label>
+                            <span id="resPercentage">0%</span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Overall Result</label>
+                            <span id="resStatus" class="status-pill">PASS</span>
+                        </div>
+                    </div>
+                    <button onclick="window.print()" class="print-btn">Print Result</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 College Management System. All official results are subject to verification.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

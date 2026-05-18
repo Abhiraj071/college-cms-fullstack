@@ -1,0 +1,120 @@
+:root {
+    /* Color Palette - Modern SaaS (Light Theme) */
+    --bg-primary: #F8FAFC;
+    --bg-secondary: #FFFFFF;
+    --accent-color: #6366F1;
+    --accent-hover: #4F46E5;
+    --accent-glow: rgba(99, 102, 241, 0.1);
+    
+    --text-primary: #020617;
+    --text-secondary: #334155; 
+    
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+
+    /* RGB values for dynamic opacities */
+    --text-primary-rgb: 15, 23, 42;
+    --bg-primary-rgb: 248, 250, 252;
+
+    /* Theme-specific Gradients */
+    --gradient-1: transparent;
+    --gradient-2: transparent;
+
+    /* Component Colors */
+    --input-bg: #FFFFFF;
+    --input-bg-focus: #FFFFFF;
+    
+    /* Dedicated Sidebar colors */
+    --sidebar-bg: #111827;
+    --sidebar-text: #E5E7EB;
+    --sidebar-text-secondary: #94A3B8;
+    --sidebar-bg-hover: rgba(255, 255, 255, 0.05);
+
+    /* Spacing System */
+    --space-xs: 0.25rem;
+    --space-sm: 0.75rem;
+    --space-md: 1.5rem;
+    --space-lg: 2rem;
+    --space-xl: 3rem;
+
+    /* Modern SaaS Borders and Shadows */
+    --glass-bg: var(--bg-secondary);
+    --glass-border: #E2E8F0;
+    --glass-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --backdrop-blur: 0px;
+
+    /* Typography */
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* Border Radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #020617;
+    --bg-secondary: #0F172A;
+    --accent-color: #818CF8;
+    --accent-hover: #6366F1;
+    --accent-glow: rgba(129, 140, 248, 0.15);
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-primary-rgb: 248, 250, 252;
+    --bg-primary-rgb: 2, 6, 23;
+    --glass-bg: #0F172A;
+    --glass-border: #1E293B;
+    --glass-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.3);
+    --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    --input-bg: #020617;
+    --input-bg-focus: #020617;
+    --sidebar-bg: #000000;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.5;
+    font-size: 0.95rem;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em; /* Tighter letter spacing for SaaS style */
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+p {
+    margin-bottom: var(--space-sm);
+    color: var(--text-secondary);
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
