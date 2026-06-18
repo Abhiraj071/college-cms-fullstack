@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const Faculty = require('../models/Faculty'); // moved to top-level (not inside hot path)
+// Register User – should only be called by admin after initial setup
 
 // Register User – should only be called by admin after initial setup
 exports.register = async (req, res) => {
@@ -25,12 +25,6 @@ exports.register = async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        let facultyId = null;
-        if (user.role === 'teacher') {
-            const fac = await Faculty.findOne({ userId: user._id });
-            if (fac) facultyId = fac._id;
-        }
-
         res.status(201).json({
             token,
             user: {
@@ -39,7 +33,6 @@ exports.register = async (req, res) => {
                 role: user.role,
                 name: user.name,
                 email: user.email,
-                facultyId,
             }
         });
     } catch (err) {
@@ -73,12 +66,6 @@ exports.login = async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        let facultyId = null;
-        if (user.role === 'teacher') {
-            const fac = await Faculty.findOne({ userId: user._id });
-            if (fac) facultyId = fac._id;
-        }
-
         res.json({
             token,
             user: {
@@ -88,7 +75,6 @@ exports.login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 department: user.department,
-                facultyId,
             }
         });
     } catch (err) {

@@ -6,10 +6,10 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 router.use(protect);
 
 router.get('/',  attendanceController.getAttendance);
-router.post('/', authorize('admin', 'teacher'), attendanceController.markAttendance);
+router.post('/', authorize('admin'), attendanceController.markAttendance);
 router.get('/student/:studentId', attendanceController.getStudentAttendance);
 
-router.post('/session', authorize('admin', 'teacher'), attendanceController.generateSession);
+router.post('/session', authorize('admin'), attendanceController.generateSession);
 router.post('/mark-self', authorize('student'), attendanceController.markSelfAttendance);
 
 module.exports = router;

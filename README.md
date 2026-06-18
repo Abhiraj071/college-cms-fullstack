@@ -80,7 +80,7 @@ college-cms/
 
 - **JWT_SECRET** must be a strong random value — never use the placeholder.
 - **ADMIN_PASSWORD** is only set on first boot. Change it via the profile page immediately.
-- When students/faculty are bulk-created, a random password is returned in the API response for that request only — store it securely and share with the user.
+- When students are bulk-created, a random password is returned in the API response for that request only — store it securely and share with the user.
 - File uploads are restricted to specific extensions + MIME types. Upload filenames are randomised.
 - All `/api/system/*` routes (export, import, reset) are admin-only.
 - Rate limiting is applied: 20 auth attempts per 15 min, 200 API calls per minute.
@@ -94,7 +94,6 @@ college-cms/
 | `POST /api/auth/login` | No | |
 | `POST /api/auth/register` | Admin only | |
 | `GET/POST/PUT/DELETE /api/students` | Yes | Write ops admin-only |
-| `GET/POST/PUT/DELETE /api/faculty` | Yes | Write ops admin-only |
 | `GET/POST/PUT/DELETE /api/courses` | Yes | Write ops admin-only |
 | `GET/POST/PUT/DELETE /api/subjects` | Yes | |
 | `GET/POST /api/attendance` | Yes | |
@@ -102,7 +101,6 @@ college-cms/
 | `GET/POST/PUT/DELETE /api/books` | Yes | |
 | `GET/POST/DELETE /api/assignments` | Yes | |
 | `GET/POST/DELETE /api/study-materials` | Yes | |
-| `GET/POST /api/timetables` | Yes | |
 | `POST /api/upload` | Yes | File upload |
 | `GET /api/system/stats` | Admin only | |
 | `GET /api/system/export` | Admin only | Full DB export |

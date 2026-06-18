@@ -7,6 +7,8 @@ const studentSchema = new mongoose.Schema({
     rollNo:   { type: String, required: true, unique: true },
     course:   { type: String, required: true },
     semester: { type: Number, required: true },
+    currentOddSemester: { type: Number, default: 1 },
+    currentEvenSemester: { type: Number, default: 2 },
     email:    { type: String, required: true },
     phone:    String,
     joinDate: { type: Date, default: Date.now },

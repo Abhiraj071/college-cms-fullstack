@@ -6,12 +6,6 @@ const courseSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    code: {
-        type: String,
-        required: true,
-        unique: true,
-        uppercase: true
-    },
     duration: {
         type: Number,
         required: true

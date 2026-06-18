@@ -2,6 +2,7 @@ import { auth } from './services/AuthService.js';
 import { router } from './services/Router.js';
 import { ROUTES } from './services/Constants.js';
 import { Login } from './components/Login.js';
+import { Home } from './components/Home.js';
 import { Layout } from './components/common/Layout.js';
 import { NotFound } from './components/common/NotFound.js';
 import { Toast } from './services/Toast.js';
@@ -23,18 +24,21 @@ class App {
     }
 
     handleRouting() {
-        const hash = window.location.hash.substring(1) || ROUTES.DASHBOARD;
+        let hash = window.location.hash.substring(1) || ROUTES.HOME;
+        if (hash.startsWith('/')) {
+            hash = hash.substring(1);
+        }
 
         if (!auth.isAuthenticated()) {
-            if (hash !== ROUTES.LOGIN) {
-                window.location.hash = ROUTES.LOGIN;
+            if (hash !== ROUTES.LOGIN && hash !== ROUTES.HOME) {
+                window.location.hash = ROUTES.HOME;
                 return;
             }
             this.render();
             return;
         }
 
-        if (hash === ROUTES.LOGIN) {
+        if (hash === ROUTES.LOGIN || hash === ROUTES.HOME) {
             window.location.hash = ROUTES.DASHBOARD;
             return;
         }
@@ -44,13 +48,25 @@ class App {
 
     render() {
         this.appElement.innerHTML = '';
-        const hash = window.location.hash.substring(1) || ROUTES.DASHBOARD;
+        let hash = window.location.hash.substring(1) || ROUTES.HOME;
+        if (hash.startsWith('/')) {
+            hash = hash.substring(1);
+        }
 
         if (!auth.isAuthenticated()) {
-            this.renderLogin();
+            if (hash === ROUTES.HOME) {
+                this.renderHome();
+            } else {
+                this.renderLogin();
+            }
         } else {
             this.renderAuthenticated(hash);
         }
+    }
+
+    renderHome() {
+        const homeComponent = new Home();
+        this.appElement.appendChild(homeComponent.render());
     }
 
     renderLogin() {
@@ -100,7 +116,7 @@ class App {
         }
 
         // Load Page Content
-        setTimeout(() => {
+        setTimeout(async () => {
             contentContainer.classList.remove('loading');
             try {
                 const params = Object.fromEntries(routeInfo.params.entries());
@@ -108,7 +124,8 @@ class App {
                     ? new routeInfo.config.component(routeInfo.config.dynamicId, params)
                     : new routeInfo.config.component(null, params);
 
-                contentContainer.appendChild(component.render());
+                const element = await component.render();
+                contentContainer.appendChild(element);
             } catch (e) {
                 console.error('Render Error:', e);
                 contentContainer.innerHTML = `

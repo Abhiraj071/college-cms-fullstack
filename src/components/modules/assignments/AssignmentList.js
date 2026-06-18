@@ -15,20 +15,7 @@ export class AssignmentList {
         const user = auth.getUser();
         const container = document.createElement('div');
 
-        if (user.role === 'admin') {
-            container.className = 'glass-panel fade-in';
-            container.style.padding = '5rem 2rem';
-            container.style.textAlign = 'center';
-            container.style.marginTop = '2rem';
-            container.innerHTML = `
-                <div style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3;">🛡️</div>
-                <h3 style="font-size: 1.5rem; letter-spacing: -0.5px; margin-bottom: 0.5rem;">Access Restricted</h3>
-                <p style="color: var(--text-secondary); max-width: 440px; margin: 0 auto; line-height: 1.6; font-weight: 500;">
-                    Administrative staff cannot manage academic assignments directly. This module is scoped exclusively for <strong>Faculty</strong> and <strong>Students</strong>.
-                </p>
-            `;
-            return container;
-        }
+
 
         container.className = 'fade-in';
 
@@ -49,7 +36,7 @@ export class AssignmentList {
                 </div>
                 <p style="color: var(--text-secondary); font-size: 1rem; font-weight: 500;">Manage assessments, track deadlines, and sync evaluations.</p>
             </div>
-            ${user.role === 'teacher' ? '<button id="create-assignment" class="glass-button" style="background: var(--accent-color); color: white; border: none; padding: 12px 24px; font-weight: 700;">➕ New Assignment</button>' : ''}
+            ${user.role === 'admin' ? '<button id="create-assignment" class="glass-button" style="background: var(--accent-color); color: white; border: none; padding: 12px 24px; font-weight: 700;">➕ New Assignment</button>' : ''}
         `;
         container.appendChild(header);
 
@@ -101,11 +88,7 @@ export class AssignmentList {
             const allSubjects = await ApiService.getSubjects();
             let subjects = [];
 
-            if (user.role === 'teacher') {
-                const facId = user.facultyId;
-                subjects = allSubjects.filter(s => String(s.faculty?._id || s.faculty) === String(facId));
-                // Add timetable check if needed (omitted here for brevity unless necessary)
-            } else if (user.role === 'student') {
+            if (user.role === 'student') {
                 const students = await ApiService.getStudents();
                 const profile = students.find(s => String(s.userId?._id || s.userId || s.userId?.id) === String(user.id || user._id));
                 if (profile) {

@@ -31,7 +31,7 @@ export class GlobalSearch {
             ">
                 <div style="display: flex; align-items: center; gap: 12px; padding: 1rem 1.25rem; border-bottom: 1px solid var(--glass-border);">
                     <span style="font-size: 1.1rem; opacity: 0.5;">🔍</span>
-                    <input id="gs-input" type="text" placeholder="Search students, subjects, faculty, notices…"
+                    <input id="gs-input" type="text" placeholder="Search students, subjects, notices…"
                         style="flex:1; border:none; outline:none; background:transparent; font-size:1rem; color:var(--text-primary); font-family:var(--font-body);">
                     <kbd style="padding:3px 8px; background:var(--bg-primary); border:1px solid var(--glass-border); border-radius:6px; font-size:0.7rem; color:var(--text-secondary);">ESC</kbd>
                 </div>
@@ -92,7 +92,7 @@ export class GlobalSearch {
     }
 
     _render(data, q) {
-        const total = (data.students?.length||0) + (data.faculty?.length||0) + (data.subjects?.length||0) + (data.notices?.length||0) + (data.courses?.length||0);
+        const total = (data.students?.length||0) + (data.subjects?.length||0) + (data.notices?.length||0) + (data.courses?.length||0);
         if (total === 0) {
             this.results.innerHTML = `<div style="padding:2rem; text-align:center; color:var(--text-secondary);">No results found for "<strong>${q}</strong>"</div>`;
             return;
@@ -126,8 +126,6 @@ export class GlobalSearch {
         this.results.innerHTML =
             section('👨‍🎓', 'Students', data.students, s =>
                 row(hl(s.name), `${s.rollNo} · ${s.course} Sem ${s.semester}`, `${ROUTES.STUDENTS_LIST}`, s.email))
-            + section('👨‍🏫', 'Faculty', data.faculty, f =>
-                row(hl(f.name), `${f.department} · ${f.designation}`, ROUTES.FACULTY_LIST))
             + section('📖', 'Subjects', data.subjects, s =>
                 row(hl(s.name), `${s.code} · ${s.course || 'General'}`, ROUTES.SUBJECTS_LIST, s.type))
             + section('📢', 'Notices', data.notices, n =>

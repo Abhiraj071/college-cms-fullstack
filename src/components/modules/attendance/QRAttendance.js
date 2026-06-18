@@ -4,7 +4,7 @@ import { Toast } from '../../../services/Toast.js';
 
 export class QRAttendance {
     constructor(role) {
-        this.role = role; // 'teacher' or 'student'
+        this.role = role; // 'admin' or 'student'
         this.activeSession = null;
         this.scanner = null;
     }
@@ -13,8 +13,8 @@ export class QRAttendance {
         const container = document.createElement('div');
         container.className = 'fade-in';
         
-        if (this.role === 'teacher') {
-            this.renderTeacherView(container);
+        if (this.role !== 'student') {
+            this.renderAdminView(container);
         } else {
             this.renderStudentView(container);
         }
@@ -22,7 +22,7 @@ export class QRAttendance {
         return container;
     }
 
-    async renderTeacherView(container) {
+    async renderAdminView(container) {
         container.innerHTML = `
             <div class="glass-panel" style="padding: 2.5rem; text-align: center; max-width: 600px; margin: 0 auto;">
                 <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">🚀 Generate Attendance QR</h3>
@@ -60,22 +60,11 @@ export class QRAttendance {
         try {
             const user = auth.getUser();
             const subjects = await ApiService.getSubjects();
-            const mySubjects = subjects.filter(s => {
-                // If admin, show all subjects. If teacher, show only theirs.
-                if (user.role === 'admin') return true;
-
-                const sFacultyId = String(s.faculty?._id || s.faculty || '');
-                const uFacultyId = String(user.facultyId || '');
-                const uUserId = String(user.id || user._id || '');
-                const sFacultyName = s.faculty?.name || '';
-                const uName = user.name || '';
-                
-                return sFacultyId === uFacultyId || sFacultyId === uUserId || (sFacultyName && sFacultyName === uName);
-            });
+            const mySubjects = subjects;
 
             subjectSelect.innerHTML = mySubjects.length > 0 
                 ? mySubjects.map(s => `<option value="${s.name}" data-course="${s.course}" data-year="${s.year}" data-sem="${s.semester}">${s.name} (${s.course})</option>`).join('')
-                : '<option value="">No assigned subjects found</option>';
+                : '<option value="">No subjects found</option>';
 
             startBtn.onclick = async () => {
                 const selectedOpt = subjectSelect.selectedOptions[0];
@@ -133,7 +122,7 @@ export class QRAttendance {
         container.innerHTML = `
             <div class="glass-panel" style="padding: 2.5rem; text-align: center; max-width: 500px; margin: 0 auto;">
                 <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">📷 Scan Attendance</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Scan the QR code displayed by your teacher to mark your attendance.</p>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Scan the QR code displayed by the administrator or instructor to mark your attendance.</p>
                 
                 <div id="reader" style="width: 100%; border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 1; margin-bottom: 1.5rem;"></div>
                 

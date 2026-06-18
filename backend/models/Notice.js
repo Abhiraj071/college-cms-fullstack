@@ -8,7 +8,7 @@ const noticeSchema = new mongoose.Schema({
     date:    { type: Date, default: Date.now },
     targetRoles: [{
         type: String,
-        enum: ['admin', 'teacher', 'student'],
+        enum: ['admin', 'student'],
     }]
 }, { timestamps: true });
 

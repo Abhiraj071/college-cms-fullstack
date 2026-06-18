@@ -29,7 +29,7 @@ export class StudyMaterialList {
                 <h2 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Academic Repository</h2>
                 <p style="color: var(--text-secondary); font-size: 0.95rem;">Digital library for notes, slideshows, and reference materials</p>
             </div>
-            ${user.role === 'teacher' ? '<button id="upload-material" class="glass-button" style="padding: 10px 20px; font-size: 0.85rem; border:none;">+ Add Resource</button>' : ''}
+            ${user.role === 'admin' ? '<button id="upload-material" class="glass-button" style="padding: 10px 20px; font-size: 0.85rem; border:none;">+ Add Resource</button>' : ''}
         `;
         container.appendChild(header);
 
@@ -50,32 +50,15 @@ export class StudyMaterialList {
 
     async loadSubjects() {
         try {
-            const [allSubjects, allTimetables] = await Promise.all([
-                ApiService.getSubjects(),
-                ApiService.getTimetables()
-            ]);
+            const allSubjects = await ApiService.getSubjects();
             const user = auth.getUser();
 
-            if (user.role === 'teacher') {
-                const myAssignedSubjects = new Set();
-                allTimetables.forEach(t => {
-                    if (t.grid) {
-                        Object.values(t.grid).forEach(slot => {
-                            const isMine = slot.teacher === user.name ||
-                                (user.facultyId && slot.teacher === String(user.facultyId)) ||
-                                slot.teacher === user._id;
-                            if (isMine) myAssignedSubjects.add(slot.subject);
-                        });
-                    }
-                });
-                this.subjects = allSubjects.filter(s => myAssignedSubjects.has(s.name));
-            } else if (user.role === 'student') {
+            if (user.role === 'student') {
                 const allStudents = await ApiService.getStudents();
                 const profile = allStudents.find(s => (s.userId?._id || s.userId) === user._id);
                 if (profile) {
                     this.subjects = allSubjects.filter(s =>
                         s.course === profile.course &&
-                        String(s.year) === String(profile.year) &&
                         String(s.semester) === String(profile.semester)
                     );
                 } else {
@@ -138,7 +121,7 @@ export class StudyMaterialList {
                 card.innerHTML = `
                     <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem;">
                         <div style="font-size: 1.5rem; background: var(--bg-primary); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid var(--glass-border);">${icon}</div>
-                        ${auth.getUser().role === 'teacher' ? `
+                        ${auth.getUser().role === 'admin' ? `
                             <button class="delete-mat" data-id="${m._id}" style="background: rgba(239, 68, 68, 0.03); border: none; color: var(--danger); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">✕</button>
                         ` : ''}
                     </div>

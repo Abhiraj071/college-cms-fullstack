@@ -19,12 +19,11 @@ export class StorageService {
     seedData() {
         const users = [
             { id: 'admin1', username: 'admin', password: this.hashPassword('password'), role: 'admin', name: 'System Administrator' },
-            { id: 'teacher1', username: 'teacher', password: this.hashPassword('password'), role: 'teacher', name: 'Prof. Sarah Doe', department: 'Computer Science' },
             { id: 'student1', username: 'student', password: this.hashPassword('password'), role: 'student', name: 'Harry Potter' }
         ];
 
         const courses = [
-            { id: 'c1', name: 'Computer Science', duration: '4 Years', term: 'Long', instructorId: 'teacher1' },
+            { id: 'c1', name: 'Computer Science', duration: '4 Years', term: 'Long' },
             { id: 'c2', name: 'Mechanical Engineering', duration: '4 Years', term: 'Long' },
             { id: 'c3', name: 'Business Logic', duration: '3 Months', term: 'Short' }
         ];

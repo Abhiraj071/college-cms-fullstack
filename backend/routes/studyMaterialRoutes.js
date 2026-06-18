@@ -4,7 +4,7 @@ const studyMaterialController = require('../controllers/studyMaterialController'
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 router.get('/', protect, studyMaterialController.getStudyMaterials);
-router.post('/', protect, authorize('teacher', 'admin'), studyMaterialController.createStudyMaterial);
-router.delete('/:id', protect, authorize('teacher', 'admin'), studyMaterialController.deleteStudyMaterial);
+router.post('/', protect, authorize('admin'), studyMaterialController.createStudyMaterial);
+router.delete('/:id', protect, authorize('admin'), studyMaterialController.deleteStudyMaterial);
 
 module.exports = router;

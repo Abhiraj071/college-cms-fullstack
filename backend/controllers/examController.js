@@ -3,6 +3,7 @@ const Mark = require('../models/Mark');
 const Student = require('../models/Student');
 const Subject = require('../models/Subject');
 const semesterService = require('../services/semesterService');
+const gradingService = require('../services/gradingService');
 
 // ── Exam CRUD ────────────────────────────────────────────────────────────────
 
@@ -225,6 +226,14 @@ exports.bulkUpsertMarks = async (req, res) => {
 exports.getStudentResultSummary = async (req, res) => {
     try {
         const { studentId } = req.params;
+        
+        const Setting = require('../models/Setting');
+        const academicPolicyObj = await Setting.findOne({ key: 'academic_policy' });
+        const passPct = academicPolicyObj && academicPolicyObj.value && academicPolicyObj.value.passPercentage !== undefined
+            ? academicPolicyObj.value.passPercentage
+            : 40;
+        const passFraction = passPct / 100;
+
         const marks = await Mark.find({ studentId })
             .populate('examId', 'title subject totalMarks passingMarks date course subjectSchedules');
 
@@ -241,7 +250,7 @@ exports.getStudentResultSummary = async (req, res) => {
             if (m.subjectMarks && m.subjectMarks.length > 0) {
                 m.subjectMarks.forEach(sm => {
                     const max = sm.maxTotal || 100;
-                    const passing = max * 0.4; // 40% passing criteria
+                    const passing = max * passFraction; // dynamic passing criteria
                     const perc = max > 0 ? ((sm.total / max) * 100).toFixed(1) : 0;
                     const isPassed = sm.total >= passing;
                     
@@ -280,7 +289,7 @@ exports.getStudentResultSummary = async (req, res) => {
                 });
             } else {
                 const max = exam ? exam.totalMarks : 100;
-                const passing = exam ? exam.passingMarks : 40;
+                const passing = exam && exam.passingMarks ? exam.passingMarks : (max * passFraction);
                 const perc = max > 0 ? ((m.marksObtained / max) * 100).toFixed(1) : 0;
                 const isPassed = m.marksObtained >= passing;
                 if (isPassed) passed++;
@@ -311,6 +320,20 @@ exports.getStudentResultSummary = async (req, res) => {
             }
         });
 
+        // Group by exam to apply grace marks per exam
+        const examsMap = {};
+        results.forEach(r => {
+            if (!examsMap[r.examId]) examsMap[r.examId] = [];
+            examsMap[r.examId].push(r);
+        });
+
+        Object.values(examsMap).forEach(examSubjects => {
+            gradingService.applyGraceMarks(examSubjects, passFraction);
+        });
+
+        // Recalculate passed count after grace marks
+        passed = results.filter(r => r.isPassed).length;
+
         const overallPerc = totalPossible > 0 ? ((totalObtained / totalPossible) * 100).toFixed(1) : 0;
 
         res.json({
@@ -335,6 +358,13 @@ exports.getSemesterWiseResults = async (req, res) => {
         const student = await Student.findById(studentId);
         if (!student) return res.status(404).json({ message: 'Student not found' });
 
+        const Setting = require('../models/Setting');
+        const academicPolicyObj = await Setting.findOne({ key: 'academic_policy' });
+        const passPct = academicPolicyObj && academicPolicyObj.value && academicPolicyObj.value.passPercentage !== undefined
+            ? academicPolicyObj.value.passPercentage
+            : 40;
+        const passFraction = passPct / 100;
+
         const marks = await Mark.find({ studentId })
             .populate('examId', 'title subject totalMarks passingMarks date course semester subjectSchedules examType');
 
@@ -353,7 +383,7 @@ exports.getSemesterWiseResults = async (req, res) => {
                     if (!subSemester) subSemester = student.semester || 1;
 
                     const max = sm.maxTotal || 100;
-                    const passing = max * 0.4;
+                    const passing = max * passFraction;
                     const isPassed = sm.total >= passing;
 
                     // Find schedule info for this subject
@@ -410,6 +440,7 @@ exports.getSemesterWiseResults = async (req, res) => {
 
                 // Card 1: Regular result
                 if (data.regular.length > 0) {
+                    gradingService.applyGraceMarks(data.regular, passFraction);
                     const totalMax = data.regular.reduce((s, r) => s + r.maxTotal, 0);
                     const totalObt = data.regular.reduce((s, r) => s + r.total, 0);
                     const allPassed = data.regular.every(r => r.isPassed);
@@ -452,6 +483,8 @@ exports.getSemesterWiseResults = async (req, res) => {
                         // Standalone supplementary
                         overlaidSubjects = data.supplementary.map(s => ({ ...s, wasUpdated: true }));
                     }
+
+                    gradingService.applyGraceMarks(overlaidSubjects, passFraction);
 
                     const totalMax = overlaidSubjects.reduce((s, r) => s + r.maxTotal, 0);
                     const totalObt = overlaidSubjects.reduce((s, r) => s + r.total, 0);
@@ -496,6 +529,13 @@ exports.getSupplementarySubjects = async (req, res) => {
             return res.status(400).json({ message: 'course and semester are required' });
         }
 
+        const Setting = require('../models/Setting');
+        const academicPolicyObj = await Setting.findOne({ key: 'academic_policy' });
+        const passPct = academicPolicyObj && academicPolicyObj.value && academicPolicyObj.value.passPercentage !== undefined
+            ? academicPolicyObj.value.passPercentage
+            : 40;
+        const passFraction = passPct / 100;
+
         const currentSem = parseInt(semester);
 
         // Find all students in this course who are in the requested semester
@@ -522,7 +562,7 @@ exports.getSupplementarySubjects = async (req, res) => {
                 // Only look at previous semesters
                 if (subSem && subSem < currentSem && !sm.isSupplementary) {
                     const max = sm.maxTotal || 100;
-                    const passing = max * 0.4;
+                    const passing = max * passFraction;
                     if (sm.total < passing) {
                         const key = sm.subjectId || sm.subjectName;
 
@@ -570,6 +610,12 @@ exports.getPublicResult = async (req, res) => {
         const { rollNo, examId } = req.query;
         if (!rollNo || !examId) {
             return res.status(400).json({ message: 'Roll Number and Exam ID are required' });
+        }
+
+        const Setting = require('../models/Setting');
+        const featureToggles = await Setting.findOne({ key: 'feature_toggles' });
+        if (featureToggles && featureToggles.value && featureToggles.value.publicResultChecker === false) {
+            return res.status(403).json({ message: 'Public result checking is currently disabled by the administration.' });
         }
 
         const student = await Student.findOne({ rollNo: rollNo.trim() });
@@ -687,8 +733,11 @@ exports.getExamStats = async (req, res) => {
         // Calculate total eligible students
         for (const classKey of examClasses) {
             const [course, semester] = classKey.split('|');
-            const count = await Student.countDocuments({ course, semester: parseInt(semester) });
-            totalEligibleStudents += count;
+            const semNum = parseInt(semester);
+            if (!isNaN(semNum)) {
+                const count = await Student.countDocuments({ course, semester: semNum });
+                totalEligibleStudents += count;
+            }
         }
 
         // Calculate today's students
@@ -699,8 +748,11 @@ exports.getExamStats = async (req, res) => {
 
         for (const classKey of todayClasses) {
             const [course, semester] = classKey.split('|');
-            const count = await Student.countDocuments({ course, semester: parseInt(semester) });
-            todayStudentsCount += count;
+            const semNum = parseInt(semester);
+            if (!isNaN(semNum)) {
+                const count = await Student.countDocuments({ course, semester: semNum });
+                todayStudentsCount += count;
+            }
         }
 
         upcomingPapers.sort((a, b) => new Date(a.date) - new Date(b.date));

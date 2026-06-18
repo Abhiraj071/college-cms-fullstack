@@ -1,79 +1,97 @@
 :root {
-    /* Color Palette - Modern SaaS (Light Theme) */
-    --bg-primary: #F8FAFC;
-    --bg-secondary: #FFFFFF;
-    --accent-color: #6366F1;
-    --accent-hover: #4F46E5;
-    --accent-glow: rgba(99, 102, 241, 0.1);
+    /* Colorful Modern SaaS (Light Theme) - Redesigned */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8FAFC;
+    --bg-tertiary: #F3F5F9;
     
-    --text-primary: #020617;
-    --text-secondary: #334155; 
+    --accent-color: #6366F1;     /* Primary Indigo */
+    --accent-blue: #3B82F6;      /* Blue accent */
+    --accent-purple: #7C3AED;    /* Deep Purple */
+    --accent-hover: #4F46E5;     /* Darker Indigo */
+    --accent-glow: rgba(99, 102, 241, 0.08);
+    
+    --text-primary: #0F172A;
+    --text-secondary: #475569; 
+    --text-tertiary: #94A3B8;
     
     --success: #10B981;
     --warning: #F59E0B;
     --danger: #EF4444;
 
-    /* RGB values for dynamic opacities */
-    --text-primary-rgb: 15, 23, 42;
-    --bg-primary-rgb: 248, 250, 252;
-
-    /* Theme-specific Gradients */
-    --gradient-1: transparent;
-    --gradient-2: transparent;
+    /* Navbar specific colors */
+    --navbar-bg: #FFFFFF;
+    --navbar-text: #0F172A;
+    --navbar-text-muted: #64748B;
+    --navbar-border: #E2E8F0;
 
     /* Component Colors */
     --input-bg: #FFFFFF;
     --input-bg-focus: #FFFFFF;
-    
-    /* Dedicated Sidebar colors */
-    --sidebar-bg: #111827;
-    --sidebar-text: #E5E7EB;
-    --sidebar-text-secondary: #94A3B8;
-    --sidebar-bg-hover: rgba(255, 255, 255, 0.05);
+    --input-border: #E2E8F0;
+    --input-placeholder: #94A3B8;
 
     /* Spacing System */
     --space-xs: 0.25rem;
-    --space-sm: 0.75rem;
-    --space-md: 1.5rem;
-    --space-lg: 2rem;
-    --space-xl: 3rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
 
     /* Modern SaaS Borders and Shadows */
-    --glass-bg: var(--bg-secondary);
+    --border-color: #E2E8F0;
+    --border-color-strong: #CBD5E1;
+    
+    --glass-bg: #FFFFFF;
     --glass-border: #E2E8F0;
-    --glass-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    --backdrop-blur: 0px;
-
+    --glass-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.03), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+    
     /* Typography */
-    --font-heading: 'Inter', sans-serif;
+    --font-heading: 'Outfit', sans-serif;
     --font-body: 'Inter', sans-serif;
 
     /* Border Radius */
-    --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
 }
 
 [data-theme="dark"] {
-    --bg-primary: #020617;
-    --bg-secondary: #0F172A;
-    --accent-color: #818CF8;
-    --accent-hover: #6366F1;
-    --accent-glow: rgba(129, 140, 248, 0.15);
+    /* Premium Futuristic Dark Theme - Redesigned */
+    --bg-primary: #0B1023;       
+    --bg-secondary: #0E1530;     
+    --bg-tertiary: #050816;      
+    
+    --accent-color: #7B61FF;     
+    --accent-blue: #00D4FF;      
+    --accent-purple: #7B61FF;
+    --accent-hover: #00D4FF;     
+    --accent-glow: rgba(123, 97, 255, 0.15);
+    
     --text-primary: #F8FAFC;
     --text-secondary: #94A3B8;
-    --text-primary-rgb: 248, 250, 252;
-    --bg-primary-rgb: 2, 6, 23;
-    --glass-bg: #0F172A;
-    --glass-border: #1E293B;
-    --glass-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.3);
-    --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-    --input-bg: #020617;
-    --input-bg-focus: #020617;
-    --sidebar-bg: #000000;
-}
+    --text-tertiary: #64748B;
+    
+    --success: #00FFB2;          
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    
+    --navbar-bg: #0E1530;
+    --navbar-text: #FFFFFF;
+    --navbar-text-muted: rgba(255, 255, 255, 0.6);
+    --navbar-border: rgba(255, 255, 255, 0.08);
 
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-color-strong: rgba(0, 212, 255, 0.2);
+
+    --glass-bg: rgba(11, 16, 35, 0.85);
+    --glass-border: rgba(123, 97, 255, 0.15);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    
+    --input-bg: #050816;
+    --input-bg-focus: #0E1530;
+    --input-border: rgba(255, 255, 255, 0.12);
+    --input-placeholder: rgba(255, 255, 255, 0.35);
+}
 
 * {
     margin: 0;
@@ -83,19 +101,19 @@
 
 body {
     font-family: var(--font-body);
-    background-color: var(--bg-primary);
+    background-color: var(--bg-tertiary);
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
     line-height: 1.5;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4 {
     font-family: var(--font-heading);
-    letter-spacing: -0.02em; /* Tighter letter spacing for SaaS style */
+    letter-spacing: -0.02em;
     font-weight: 600;
     color: var(--text-primary);
 }
@@ -107,12 +125,13 @@ p {
 
 ::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
 }
 ::-webkit-scrollbar-track {
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: var(--glass-border);
+    background: var(--border-color);
     border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {

@@ -9,6 +9,9 @@ const path      = require('path');
 
 const { protect, authorize } = require('./middleware/authMiddleware');
 
+// Initialize Cron Jobs
+require('./jobs/backupJob');
+
 const app = express();
 
 // ─── Body Parser ─────────────────────────────────────────────────────────────
@@ -33,11 +36,9 @@ app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, max: 20 }));
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/auth',            require('./routes/authRoutes'));
 app.use('/api/students',        protect, require('./routes/studentRoutes'));
-app.use('/api/faculty',         protect, require('./routes/facultyRoutes'));
 app.use('/api/courses',         protect, require('./routes/courseRoutes'));
 app.use('/api/subjects',        protect, require('./routes/subjectRoutes'));
 app.use('/api/attendance',      protect, require('./routes/attendanceRoutes'));
-app.use('/api/timetables',      protect, require('./routes/timetableRoutes'));
 app.use('/api/notices',         protect, require('./routes/noticeRoutes'));
 app.use('/api/assignments',     protect, require('./routes/assignmentRoutes'));
 app.use('/api/books',           protect, require('./routes/bookRoutes'));
@@ -45,8 +46,9 @@ app.use('/api/study-materials', protect, require('./routes/studyMaterialRoutes')
 app.use('/api/search',          protect, require('./routes/searchRoutes'));
 app.use('/api/upload',          protect, require('./routes/uploadRoutes'));
 app.use('/api/email',           protect, authorize('admin'), require('./routes/emailRoutes'));
-app.use('/api/system',          protect, authorize('admin'), require('./routes/systemRoutes'));
+app.use('/api/system',          require('./routes/systemRoutes'));
 app.use('/api/exams',           require('./routes/examRoutes'));
+app.use('/api/exam-applications', protect, require('./routes/examApplicationRoutes'));
 app.use('/api/analytics',       protect, require('./routes/analyticsRoutes'));
 app.use('/api/activity-log',    protect, require('./routes/activityLogRoutes'));
 app.use('/api/alumni',          protect, require('./routes/alumniRoutes'));
@@ -71,3 +73,5 @@ mongoose.connect(process.env.MONGODB_URI)
         console.error('MongoDB connection failed:', err.message);
         process.exit(1);
     });
+// restart triggered
+

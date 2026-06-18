@@ -16,16 +16,17 @@ router.get('/results/semester-wise/:studentId', ctrl.getSemesterWiseResults);
 router.get('/supplementary-subjects',     ctrl.getSupplementarySubjects);
 router.get('/stats/dashboard',            ctrl.getExamStats);
 
+router.get('/marks', authorize('admin'), ctrl.getAllMarks);
+
 router.get('/:examId/marks',              ctrl.getMarksByExam);
 router.get('/:id',                        ctrl.getExamById);
 
-router.post('/',           authorize('admin', 'teacher'), ctrl.createExam);
-router.put('/:id',         authorize('admin', 'teacher'), ctrl.updateExam);
+router.post('/',           authorize('admin'), ctrl.createExam);
+router.put('/:id',         authorize('admin'), ctrl.updateExam);
 router.delete('/:id',      authorize('admin'),            ctrl.deleteExam);
 
 // ── Marks ────────────────────────────────────────────────────────────────────
-router.get('/marks', authorize('admin', 'teacher'), ctrl.getAllMarks);
-router.post('/marks', authorize('admin', 'teacher'), ctrl.upsertMark);
-router.post('/marks/bulk', authorize('admin', 'teacher'), ctrl.bulkUpsertMarks);
+router.post('/marks', authorize('admin'), ctrl.upsertMark);
+router.post('/marks/bulk', authorize('admin'), ctrl.bulkUpsertMarks);
 
 module.exports = router;

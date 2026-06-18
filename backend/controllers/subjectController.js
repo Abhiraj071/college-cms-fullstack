@@ -8,9 +8,8 @@ exports.getSubjects = async (req, res) => {
         if (course) query.course = course;
         if (year) query.year = parseInt(year);
         if (semester) query.semester = parseInt(semester);
-        if (req.query.faculty) query.faculty = req.query.faculty;
 
-        const subjects = await Subject.find(query).populate('faculty').lean();
+        const subjects = await Subject.find(query).lean();
         res.json(subjects);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -22,6 +21,26 @@ exports.createSubject = async (req, res) => {
         const subject = new Subject(req.body);
         await subject.save();
         res.status(201).json(subject);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+
+exports.createBulkSubjects = async (req, res) => {
+    try {
+        const { subjects } = req.body;
+        if (!subjects || !Array.isArray(subjects)) {
+            return res.status(400).json({ message: 'An array of subjects is required.' });
+        }
+        
+        // Remove existing subjects for the given course to prevent duplicates when editing
+        // Assuming all subjects in the array belong to the same course.
+        if (subjects.length > 0 && subjects[0].course) {
+            await Subject.deleteMany({ course: subjects[0].course });
+        }
+
+        const inserted = await Subject.insertMany(subjects);
+        res.status(201).json({ message: `${inserted.length} subjects successfully created.`, inserted });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }

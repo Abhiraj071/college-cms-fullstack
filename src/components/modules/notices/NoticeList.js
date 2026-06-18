@@ -49,7 +49,7 @@ export class NoticeList {
         `;
 
         actionSection.appendChild(filterSection);
-        if (user.role === 'admin' || user.role === 'teacher') {
+        if (user.role === 'admin') {
             const addBtn = document.createElement('button');
             addBtn.className = 'glass-button';
             addBtn.style.background = 'var(--accent-color)';
@@ -139,7 +139,7 @@ export class NoticeList {
                             </div>
                             <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">${notice.author?.name || 'Academic Admin'}</span>
                         </div>
-                        ${(user.role === 'admin' || (user.role === 'teacher' && notice.author && (notice.author._id === user.id || notice.author._id === user._id))) ? `
+                        ${(user.role === 'admin') ? `
                             <div style="display: flex; gap: 8px;">
                                 <button class="edit-btn" style="background: var(--bg-primary); border: 1px solid var(--glass-border); border-radius: 8px; padding: 6px; cursor: pointer; color: var(--text-secondary);">✏️</button>
                                 <button class="del-btn" style="background: var(--bg-primary); border: 1px solid var(--danger); border-radius: 8px; padding: 6px; cursor: pointer; color: var(--danger);">🗑️</button>

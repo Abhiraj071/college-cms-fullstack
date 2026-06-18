@@ -14,7 +14,8 @@ export class AttendanceView {
         const localDateString = new Date(localDate.getTime() - (offset * 60 * 1000)).toISOString().split('T')[0];
         this.selectedDate = this.params.date || localDateString;
         this.sessionDetails = null; // { course, year, semester, subject }
-        this.activeTab = 'mark'; // mark, defaulters, history
+        const user = auth.getUser();
+        this.activeTab = (user && user.role === 'student') ? 'my-attendance' : 'mark';
         this.assignedClasses = [];
     }
 
@@ -121,6 +122,19 @@ export class AttendanceView {
 
     renderTab(container) {
         container.innerHTML = '';
+        const user = auth.getUser();
+        
+        // Ensure student cannot access admin tabs and vice versa
+        if (user && user.role === 'student') {
+            if (this.activeTab !== 'my-attendance' && this.activeTab !== 'scan-attendance') {
+                this.activeTab = 'my-attendance';
+            }
+        } else {
+            if (this.activeTab === 'my-attendance' || this.activeTab === 'scan-attendance') {
+                this.activeTab = 'mark';
+            }
+        }
+
         if (this.activeTab === 'mark') {
             if (this.selectedCourse) {
                 this.renderAttendanceForm(container);
@@ -132,7 +146,6 @@ export class AttendanceView {
         } else if (this.activeTab === 'scan-attendance') {
             this.renderScanAttendanceTab(container);
         } else if (this.activeTab === 'my-attendance') {
-            const user = auth.getUser();
             this.renderStudentView(container, user);
         } else {
             this.renderHistoryTab(container);
@@ -140,7 +153,7 @@ export class AttendanceView {
     }
 
     renderQRSessionTab(container) {
-        const qrComp = new QRAttendance('teacher');
+        const qrComp = new QRAttendance('admin');
         container.appendChild(qrComp.render());
     }
 
@@ -157,15 +170,32 @@ export class AttendanceView {
         controls.style.padding = '1.5rem';
         controls.style.marginBottom = '2rem';
         controls.innerHTML = `
-            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
-                <div style="width: 220px;">
+            <div style="display: flex; gap: 1.5rem; align-items: flex-end; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 150px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Session Date</label>
-                    <input type="date" id="attDate" value="${this.selectedDate}" style="width: 100%;">
+                    <input type="date" id="attDate" value="${this.selectedDate}" style="width: 100%;" class="glass-button">
                 </div>
-                <div style="flex: 1; min-width: 250px; padding: 12px 20px; background: var(--bg-primary); border-radius: 12px; border: 1px solid var(--glass-border);">
-                     <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500;">
-                        <span id="day-indicator" style="color: var(--accent-color); font-weight: 700;">Select a date</span> to view scheduled classes.
-                     </p>
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Select Course</label>
+                    <select id="attCourse" class="glass-button" style="width: 100%; text-align: left; background: rgba(0,0,0,0.1); color: var(--text-primary);">
+                        <option value="">-- Choose Course --</option>
+                    </select>
+                </div>
+                <div style="flex: 1; min-width: 120px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Select Semester</label>
+                    <select id="attSemester" class="glass-button" style="width: 100%; text-align: left; background: rgba(0,0,0,0.1); color: var(--text-primary);">
+                        <option value="">-- Choose Semester --</option>
+                        ${[1,2,3,4,5,6,7,8,9,10].map(s => `<option value="${s}">Semester ${s}</option>`).join('')}
+                    </select>
+                </div>
+                <div style="flex: 2; min-width: 200px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Select Subject</label>
+                    <select id="attSubject" class="glass-button" style="width: 100%; text-align: left; background: rgba(0,0,0,0.1); color: var(--text-primary);" disabled>
+                        <option value="">-- Select Course & Semester First --</option>
+                    </select>
+                </div>
+                <div>
+                    <button id="loadRosterBtn" class="glass-button" style="background: var(--accent-color); color: white; border: none; font-weight: 700; height: 42px;" disabled>Load Roster</button>
                 </div>
             </div>
         `;
@@ -173,147 +203,91 @@ export class AttendanceView {
 
         const listResults = document.createElement('div');
         listResults.id = 'attendance-quick-selection';
-        const grid = document.createElement('div');
-        grid.style.display = 'grid';
-        grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(320px, 1fr))';
-        grid.style.gap = '1.5rem';
-        listResults.appendChild(grid);
+        listResults.innerHTML = `
+            <div class="glass-panel fade-in" style="text-align: center; padding: 5rem 2rem;">
+                <div style="font-size: 3.5rem; margin-bottom: 1.5rem; opacity: 0.3;">📝</div>
+                <h3 style="color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.5rem;">Mark Student Attendance</h3>
+                <p style="color: var(--text-secondary); max-width: 440px; margin: 0 auto; line-height: 1.6;">
+                    Select the course, semester, and subject from the controls above to load the student attendance sheet.
+                </p>
+            </div>
+        `;
         container.appendChild(listResults);
 
         try {
-            const [allCourses, allTimetables, allSubjects, dateAttendance] = await Promise.all([
+            const [courses, subjects] = await Promise.all([
                 ApiService.getCourses(),
-                ApiService.getTimetables(),
-                ApiService.getSubjects(),
-                ApiService.getAttendance(this.selectedDate)
+                ApiService.getSubjects()
             ]);
 
-            const renderCards = () => {
-                grid.innerHTML = '';
-                const dateObj = new Date(this.selectedDate);
-                const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-                controls.querySelector('#day-indicator').textContent = `Schedule for ${dayName}`;
+            const courseSelect = controls.querySelector('#attCourse');
+            courses.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.name;
+                opt.textContent = c.name;
+                courseSelect.appendChild(opt);
+            });
 
-                let itemsToRender = [];
-                if (user.role === 'teacher') {
-                    const myClassMap = new Map();
-                    allTimetables.forEach(t => {
-                        if (t.grid) {
-                            Object.entries(t.grid).forEach(([key, slot]) => {
-                                const [day] = key.split('::');
-                                if (day !== dayName) return;
-                                if (slot.subject && /break/i.test(slot.subject)) return;
+            const semSelect = controls.querySelector('#attSemester');
+            const subjSelect = controls.querySelector('#attSubject');
+            const loadRosterBtn = controls.querySelector('#loadRosterBtn');
+            const dateInput = controls.querySelector('#attDate');
 
-                                const isMyClass = (
-                                    slot.teacher === user.name ||
-                                    (user.facultyId && slot.teacher === String(user.facultyId)) ||
-                                    slot.teacher === user._id
-                                );
+            const updateSubjects = () => {
+                const selectedCourse = courseSelect.value;
+                const selectedSem = semSelect.value;
 
-                                if (isMyClass) {
-                                    const uniqueKey = `${t.course}|${t.year}|${t.semester}|${slot.subject}`;
-                                    if (!myClassMap.has(uniqueKey)) {
-                                        myClassMap.set(uniqueKey, {
-                                            course: t.course,
-                                            year: t.year,
-                                            semester: t.semester,
-                                            subject: slot.subject,
-                                            time: key.split('::')[1],
-                                            tag: 'SCHEDULED'
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    itemsToRender = Array.from(myClassMap.values());
-                } else {
-                    itemsToRender = allCourses.map(c => ({
-                        course: c.name,
-                        year: '1',
-                        semester: '1',
-                        subject: 'Manual Entry',
-                        details: c.duration ? `${c.duration} Years` : 'Course',
-                        tag: 'COURSE'
-                    }));
-                }
-
-                if (itemsToRender.length === 0) {
-                    grid.innerHTML = `
-                        <div class="glass-panel" style="grid-column: 1/-1; text-align: center; padding: 5rem 2rem;">
-                            <div style="font-size: 3rem; margin-bottom: 1.5rem; opacity: 0.3;">📅</div>
-                            <h3 style="color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.5rem;">No Classes Today</h3>
-                            <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto;">No teaching sessions are found in the timetable for this date. You can still manually enter attendance if needed.</p>
-                        </div>
-                    `;
+                subjSelect.innerHTML = '<option value="">-- Choose Subject --</option>';
+                if (!selectedCourse || !selectedSem) {
+                    subjSelect.disabled = true;
+                    loadRosterBtn.disabled = true;
                     return;
                 }
 
-                itemsToRender.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'glass-panel fade-in';
-                    card.style.padding = '0';
-                    card.style.cursor = 'pointer';
-                    card.style.border = '1px solid var(--glass-border)';
-                    card.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-                    
-                    card.onmouseenter = () => {
-                        card.style.transform = 'translateY(-4px)';
-                        card.style.borderColor = 'var(--accent-color)';
-                        card.style.boxShadow = 'var(--hover-shadow)';
-                    };
-                    card.onmouseleave = () => {
-                        card.style.transform = 'none';
-                        card.style.borderColor = 'var(--glass-border)';
-                        card.style.boxShadow = 'var(--glass-shadow)';
-                    };
+                const filtered = subjects.filter(s => 
+                    String(s.course) === String(selectedCourse) && 
+                    String(s.semester) === String(selectedSem)
+                );
 
-                    card.onclick = () => {
-                        this.sessionDetails = {
-                            course: item.course,
-                            year: item.year,
-                            semester: item.semester,
-                            subject: item.subject
-                        };
-                        this.renderAttendanceForm(container);
-                    };
-
-                    const isTaken = dateAttendance && dateAttendance.some(att => 
-                        String(att.course).trim() === String(item.course).trim() && 
-                        String(att.year) === String(item.year) && 
-                        String(att.semester) === String(item.semester) && 
-                        String(att.subject).trim() === String(item.subject).trim() &&
-                        att.students && att.students.length > 0
-                    );
-
-                    card.style.border = isTaken ? '1px solid var(--success)' : '1px solid var(--glass-border)';
-                    card.style.borderRadius = '12px';
-
-                    card.innerHTML = `
-                        <div style="padding: 1.5rem; background: ${isTaken ? 'rgba(16, 185, 129, 0.05)' : 'transparent'}; border-radius: 12px 12px 0 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <span style="background: var(--accent-glow); color: var(--accent-color); padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">${item.tag}</span>
-                                <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 600;">Year ${item.year} • Sem ${item.semester}</span>
-                            </div>
-                            <h4 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">${item.course}</h4>
-                            <div style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;">
-                                <span>📚</span> ${item.subject}
-                            </div>
-                            ${item.time ? `<div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">🕒 Time: ${item.time}</div>` : ''}
-                        </div>
-                        <div style="padding: 12px; text-align: center; background: ${isTaken ? 'var(--success)' : 'var(--bg-primary)'}; border-top: 1px solid ${isTaken ? 'var(--success)' : 'var(--glass-border)'};; font-size: 0.85rem; font-weight: 700; color: ${isTaken ? 'white' : 'var(--accent-color)'}; border-radius: 0 0 12px 12px;">
-                            ${isTaken ? '✅ ATTENDANCE LOGGED' : 'MARK ATTENDANCE &rarr;'}
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
+                if (filtered.length === 0) {
+                    subjSelect.innerHTML = '<option value="">No subjects found for this class</option>';
+                    subjSelect.disabled = true;
+                    loadRosterBtn.disabled = true;
+                } else {
+                    filtered.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.name;
+                        opt.textContent = `${s.name} (${s.code})`;
+                        subjSelect.appendChild(opt);
+                    });
+                    subjSelect.disabled = false;
+                    loadRosterBtn.disabled = !subjSelect.value;
+                }
             };
 
-            renderCards();
-            controls.querySelector('#attDate').addEventListener('change', (e) => {
+            courseSelect.onchange = updateSubjects;
+            semSelect.onchange = updateSubjects;
+            subjSelect.onchange = () => {
+                loadRosterBtn.disabled = !subjSelect.value;
+            };
+            dateInput.onchange = (e) => {
                 this.selectedDate = e.target.value;
-                renderCards();
-            });
+            };
+
+            loadRosterBtn.onclick = () => {
+                const course = courseSelect.value;
+                const semester = semSelect.value;
+                const subject = subjSelect.value;
+                const year = Math.ceil(Number(semester) / 2);
+
+                this.sessionDetails = {
+                    course,
+                    year,
+                    semester,
+                    subject
+                };
+                this.renderAttendanceForm(container);
+            };
 
         } catch (err) {
             Toast.error('Load Error: ' + err.message);

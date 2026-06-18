@@ -57,9 +57,6 @@ export class NoticeForm {
                             <input type="checkbox" name="target" value="admin" checked> Admin
                          </label>
                          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: normal;">
-                            <input type="checkbox" name="target" value="teacher" checked> Teachers
-                         </label>
-                         <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: normal;">
                             <input type="checkbox" name="target" value="student" checked> Students
                          </label>
                     </div>

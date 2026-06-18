@@ -99,36 +99,25 @@ export class ApiService {
         });
     }
 
-    // --- Faculty Endpoints ---
+    // --- Faculty Endpoints (Stubbed) ---
     static async getFaculty() {
-        return await this.request('/faculty');
+        return [];
     }
 
     static async addFaculty(facultyData) {
-        return await this.request('/faculty', {
-            method: 'POST',
-            body: JSON.stringify(facultyData)
-        });
+        return { success: true };
     }
 
     static async addBulkFaculty(bulkData) {
-        return await this.request('/faculty/bulk', {
-            method: 'POST',
-            body: JSON.stringify(bulkData)
-        });
+        return { success: true };
     }
 
     static async deleteFaculty(id) {
-        return await this.request(`/faculty/${id}`, {
-            method: 'DELETE'
-        });
+        return { success: true };
     }
 
     static async updateFaculty(id, facultyData) {
-        return await this.request(`/faculty/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify(facultyData)
-        });
+        return { success: true };
     }
 
     // --- Course & Branch Endpoints ---
@@ -261,35 +250,25 @@ export class ApiService {
         });
     }
 
-    // --- Timetable Endpoints ---
+    // --- Timetable Endpoints (Stubbed) ---
     static async getTimetables(course, year, semester) {
-        let url = '/timetables?';
-        if (course) url += `course=${encodeURIComponent(course)}&`;
-        if (year) url += `year=${year}&`;
-        if (semester) url += `semester=${semester}`;
-        return await this.request(url);
+        return [];
     }
 
     static async updateTimetable(timetableData) {
-        return await this.request('/timetables', {
-            method: 'POST',
-            body: JSON.stringify(timetableData)
-        });
+        return { success: true };
     }
 
     static async deleteTimetable(id) {
-        return await this.request(`/timetables/${id}`, {
-            method: 'DELETE'
-        });
+        return { success: true };
     }
 
     // --- Subject Endpoints ---
-    static async getSubjects(course, year, semester, faculty) {
+    static async getSubjects(course, year, semester) {
         let url = '/subjects?';
         if (course) url += `course=${encodeURIComponent(course)}&`;
         if (year) url += `year=${year}&`;
-        if (semester) url += `semester=${semester}&`;
-        if (faculty) url += `faculty=${faculty}`;
+        if (semester) url += `semester=${semester}`;
         return await this.request(url);
     }
 
@@ -297,6 +276,13 @@ export class ApiService {
         return await this.request('/subjects', {
             method: 'POST',
             body: JSON.stringify(subjectData)
+        });
+    }
+
+    static async addBulkSubjects(data) {
+        return await this.request('/subjects/bulk', {
+            method: 'POST',
+            body: JSON.stringify(data)
         });
     }
 
@@ -315,7 +301,7 @@ export class ApiService {
 
     // --- Assignment Endpoints ---
     static async getFacultyClasses() {
-        return await this.request('/assignments/faculty-classes');
+        return [];
     }
 
     static async getAssignments(course, subject) {
@@ -457,6 +443,23 @@ export class ApiService {
     }
     static async getSupplementarySubjects(course, semester) {
         return await this.request(`/exams/supplementary-subjects?course=${encodeURIComponent(course)}&semester=${semester}`);
+    }
+
+    // ── Exam Applications ─────────────────────────────────────────────────────
+    static async getEligibleExams() {
+        return await this.request('/exam-applications/eligible-exams');
+    }
+    static async getExamFormDetails(examId) {
+        return await this.request(`/exam-applications/${examId}/form-details`);
+    }
+    static async submitExamApplication(data) {
+        return await this.request('/exam-applications/submit', { method: 'POST', body: JSON.stringify(data) });
+    }
+    static async verifyExamPayment(sessionId, examId) {
+        return await this.request(`/exam-applications/verify-payment?session_id=${sessionId}&examId=${examId}`);
+    }
+    static async getAdmitCard(examId) {
+        return await this.request(`/exam-applications/${examId}/admit-card`);
     }
 
     // ── Analytics ─────────────────────────────────────────────────────────────

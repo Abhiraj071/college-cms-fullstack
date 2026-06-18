@@ -3,6 +3,9 @@ const Student = require('../models/Student');
 const Course = require('../models/Course');
 const Alumni = require('../models/Alumni');
 const Setting = require('../models/Setting');
+const Mark = require('../models/Mark');
+const Exam = require('../models/Exam');
+const academicService = require('../services/academicService');
 
 exports.exportBackup = async (req, res) => {
     try {
@@ -140,8 +143,36 @@ exports.factoryReset = async (req, res) => {
 exports.getSettings = async (req, res) => {
     try {
         const Setting = require('../models/Setting');
+        const jwt = require('jsonwebtoken');
         const settings = await Setting.find({});
-        res.json(settings);
+        
+        let isAdmin = false;
+        let token;
+        if (req.headers.authorization && req.headers.authorization.toLowerCase().startsWith('bearer')) {
+            token = req.headers.authorization.split(' ')[1];
+        }
+        if (token) {
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                if (decoded.role === 'admin') {
+                    isAdmin = true;
+                }
+            } catch (err) {
+                // Ignore and treat as non-admin
+            }
+        }
+
+        const sanitizedSettings = settings.map(setting => {
+            const doc = setting.toObject();
+            if (doc.key === 'payment_settings') {
+                if (!isAdmin && doc.value) {
+                    delete doc.value.stripeSecretKey;
+                }
+            }
+            return doc;
+        });
+
+        res.json(sanitizedSettings);
     } catch (err) {
         res.status(500).json({ message: 'Failed to fetch settings: ' + err.message });
     }
@@ -164,7 +195,7 @@ exports.updateSetting = async (req, res) => {
 
                 // If the new semester starts after the previous one ended, it's a rollover
                 if (newStart > oldEnd) {
-                    await promoteStudents();
+                    await academicService.promoteStudents();
                 }
             }
         }
@@ -181,50 +212,3 @@ exports.updateSetting = async (req, res) => {
     }
 };
 
-async function promoteStudents() {
-    console.log('--- Starting Student Promotion Process ---');
-    const students = await Student.find({});
-    const courses = await Course.find({});
-    const courseMap = {};
-    courses.forEach(c => courseMap[c.name] = c);
-
-    for (const student of students) {
-        const course = courseMap[student.course];
-        const maxSem = course ? course.duration * 2 : 8; // Default to 8 sem if course not found
-
-        if (student.semester < maxSem) {
-            // Promote to next semester
-            student.semester += 1;
-            // Reset attendance for new semester
-            student.present = 0;
-            student.absent = 0;
-            student.totalClasses = 0;
-            student.attendancePercentage = '0%';
-            await student.save();
-        } else {
-            // Graduate student
-            const startYear = new Date(student.joinDate).getFullYear();
-            const endYear = new Date().getFullYear();
-            const batchLabel = `${student.course} ${startYear}-${endYear}`;
-
-            await Alumni.create({
-                userId: student.userId,
-                name: student.name,
-                rollNo: student.rollNo,
-                course: student.course,
-                batch: batchLabel,
-                email: student.email,
-                phone: student.phone,
-                joinDate: student.joinDate,
-                graduationDate: new Date(),
-                cgpa: student.cgpa,
-                totalAttendance: student.attendancePercentage
-            });
-
-            // Remove from active students
-            await Student.findByIdAndDelete(student._id);
-            console.log(`Graduated: ${student.name} (${batchLabel})`);
-        }
-    }
-    console.log('--- Student Promotion Process Completed ---');
-}

@@ -7,6 +7,7 @@ router.use(protect);
 
 router.get('/', subjectController.getSubjects);
 router.post('/', authorize('admin'), subjectController.createSubject);
+router.post('/bulk', authorize('admin'), subjectController.createBulkSubjects);
 router.put('/:id', authorize('admin'), subjectController.updateSubject);
 router.delete('/:id', authorize('admin'), subjectController.deleteSubject);
 

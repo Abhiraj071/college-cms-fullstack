@@ -9,7 +9,6 @@ exports.getStudyMaterials = async (req, res) => {
 
         const materials = await StudyMaterial.find(query)
             .populate('subject', 'name')
-            .populate('faculty', 'name')
             .lean()
             .sort({ createdAt: -1 });
         res.json(materials);
@@ -21,8 +20,7 @@ exports.getStudyMaterials = async (req, res) => {
 exports.createStudyMaterial = async (req, res) => {
     try {
         const material = new StudyMaterial({
-            ...req.body,
-            faculty: req.user._id
+            ...req.body
         });
         await material.save();
         res.status(201).json(material);
@@ -36,7 +34,7 @@ exports.deleteStudyMaterial = async (req, res) => {
         const material = await StudyMaterial.findById(req.params.id);
         if (!material) return res.status(404).json({ message: 'Material not found' });
 
-        if (material.faculty.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+        if (req.user.role !== 'admin') {
             return res.status(401).json({ message: 'Not authorized' });
         }
 

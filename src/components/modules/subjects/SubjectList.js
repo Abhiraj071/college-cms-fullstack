@@ -9,9 +9,6 @@ export class SubjectList {
     constructor(id = null, params = {}) {
         this.params = params;
         this.subjects = [];
-        this.selectedFaculty = '';
-        this.faculty = [];
-        this.timetables = [];
         this.selectedDate = new Date();
     }
 
@@ -37,7 +34,7 @@ export class SubjectList {
                 <span style="font-size: 2rem;">📚</span>
                 <h2 style="font-size: 2rem; margin: 0; letter-spacing: -1px;">Subjects</h2>
             </div>
-            <p style="color: var(--text-secondary); font-size: 1rem; font-weight: 500;">Manage the institutional subject repository and class assignments.</p>
+            <p style="color: var(--text-secondary); font-size: 1rem; font-weight: 500;">Manage the institutional subject repository and curricula.</p>
         `;
 
         if (this.params.mode === 'assigned' || isStudent) {
@@ -92,10 +89,6 @@ export class SubjectList {
                 <label style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">Search Catalog</label>
                 <input type="text" id="subjectSearch" placeholder="Filter by name or code..." style="width: 100%;">
             </div>
-            <div id="facultyFilterContainer" style="width: 240px; ${isAdmin ? '' : 'display:none;'}">
-                <label style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">Narrow by Faculty</label>
-                <select id="facultyFilter" style="width: 100%;"><option value="">All Faculty</option></select>
-            </div>
         `;
         container.appendChild(filterBar);
 
@@ -104,9 +97,7 @@ export class SubjectList {
         container.appendChild(tableCard);
 
         const loadData = async () => {
-            const facultyFilter = filterBar.querySelector('#facultyFilter');
             const subjectSearch = filterBar.querySelector('#subjectSearch');
-            this.selectedFaculty = facultyFilter ? facultyFilter.value : '';
             const searchTerm = (subjectSearch ? subjectSearch.value : '').toLowerCase();
 
             tableCard.innerHTML = `
@@ -117,43 +108,20 @@ export class SubjectList {
             `;
 
             try {
-                const [subjectsData, timetablesData, allStudents] = await Promise.all([
+                const [subjectsData, allStudents] = await Promise.all([
                     ApiService.getSubjects(),
-                    ApiService.getTimetables(),
                     isStudent ? ApiService.getStudents() : Promise.resolve([])
                 ]);
                 this.subjects = subjectsData;
-                this.timetables = timetablesData;
 
                 if (isStudent) {
                     const profile = allStudents.find(s => String(s.userId?._id || s.userId || s.userId?.id) === String(user.id || user._id));
                     if (profile) {
                         const year = Math.ceil((profile.semester || 1) / 2);
-                        const relevantT = this.timetables.filter(t => t.course === profile.course && String(t.year) === String(year) && String(t.semester) === String(profile.semester));
-                        const uniqueSubjects = new Set();
-                        relevantT.forEach(t => { if(t.grid) Object.values(t.grid).forEach(slot => { if(slot.subject && !slot.subject.match(/lunch|break/i)) uniqueSubjects.add(slot.subject); }); });
-                        this.subjects = this.subjects.filter(s => uniqueSubjects.has(s.name)).map(s => ({ ...s, course: profile.course, year, semester: profile.semester }));
+                        this.subjects = this.subjects.filter(s => s.course === profile.course && String(s.semester) === String(profile.semester)).map(s => ({ ...s, course: profile.course, year, semester: profile.semester }));
                     }
                 } else if (searchTerm) {
                     this.subjects = this.subjects.filter(s => s.name.toLowerCase().includes(searchTerm) || (s.code && s.code.toLowerCase().includes(searchTerm)));
-                }
-
-                if (this.selectedFaculty && isAdmin) {
-                    this.subjects = this.subjects.filter(s => String(s.faculty?._id || s.faculty) === String(this.selectedFaculty));
-                }
-
-                if (this.params.mode === 'assigned' && user.role === 'teacher') {
-                    const flattened = [];
-                    this.subjects.forEach(s => {
-                        const prim = s.faculty?._id || s.faculty;
-                        const primName = s.faculty?.name || '';
-                        const isPrimary = (prim && user.facultyId && String(prim) === String(user.facultyId)) || (prim && String(prim) === String(user._id)) || (primName && primName === user.name);
-                        const ctx = [];
-                        this.timetables.forEach(t => { if(t.grid && Object.values(t.grid).some(slot => slot.subject === s.name && (slot.teacher === user.name || (user.facultyId && slot.teacher === String(user.facultyId)) || slot.teacher === user._id))) ctx.push({ course: t.course, year: t.year, semester: t.semester, timetableId: t._id }); });
-                        if (ctx.length > 0) ctx.forEach(c => flattened.push({ ...s, ...c, _isContextual: true }));
-                        else if (isPrimary) flattened.push({ ...s, _isContextual: false });
-                    });
-                    this.subjects = flattened;
                 }
 
                 tableCard.innerHTML = '';
@@ -177,20 +145,10 @@ export class SubjectList {
                         card.className = 'glass-panel fade-in';
                         card.style.padding = '0';
                         card.style.overflow = 'hidden';
-                        card.style.display = 'flex';
-                        card.style.flexDirection = 'column';
-                        card.style.border = '1px solid var(--glass-border)';
-                        card.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-                        
-                        const entries = [];
-                        const relevantT = item.course ? this.timetables.filter(t => t.course === item.course && t.year == item.year && t.semester == item.semester) : this.timetables;
-                        relevantT.forEach(t => { if(t.grid) Object.entries(t.grid).forEach(([key, slot]) => { if(slot.subject === item.name && (isStudent || (slot.teacher === user.name || (user.facultyId && slot.teacher === String(user.facultyId)) || slot.teacher === user._id))) { const [day, time] = key.split('::'); entries.push({ day, time, room: slot.room }); } }); });
-                        entries.sort((a,b) => { const days = {'Monday':1,'Tuesday':2,'Wednesday':3,'Thursday':4,'Friday':5}; return (days[a.day] - days[b.day]) || a.time.localeCompare(b.time); });
-
                         card.innerHTML = `
                             <div style="padding: 1.75rem; background: linear-gradient(135deg, var(--bg-secondary), rgba(99, 102, 241, 0.05)); border-bottom: 1px solid var(--glass-border);">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                    <span style="background: var(--accent-glow); color: var(--accent-color); padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">${item.type || 'Lecture'}</span>
+                                    <span style="background: var(--accent-glow); color: var(--accent-color); padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">${item.type || 'Theory'}</span>
                                     <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; font-family: monospace;">#${item.code || '---'}</span>
                                 </div>
                                 <h3 style="margin: 0; font-size: 1.35rem; letter-spacing: -0.5px; color: var(--text-primary); line-height: 1.2;">${item.name}</h3>
@@ -199,14 +157,11 @@ export class SubjectList {
                                 </div>` : ''}
                             </div>
                             <div style="padding: 1.25rem; flex: 1; background: var(--bg-primary);">
-                                <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Weekly Schedule</div>
-                                <div style="display: flex; flex-direction: column; gap: 6px;">
-                                    ${entries.length > 0 ? entries.map(e => `
-                                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; padding: 6px 10px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--glass-border);">
-                                            <span style="font-weight: 600; color: var(--text-primary);">${e.day.substring(0,3)} • ${e.time}</span>
-                                            <span style="font-weight: 700; color: var(--accent-color); font-size: 0.75rem;">Room ${e.room || 'TBA'}</span>
-                                        </div>
-                                    `).join('') : `<div style="font-size: 0.8rem; color: var(--text-secondary); opacity: 0.5; font-style: italic; padding: 10px; text-align: center; border: 1px dashed var(--glass-border); border-radius: 8px;">No sessions mapped.</div>`}
+                                <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Subject Details</div>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; margin: 0 0 1rem;">${item.description || 'No description provided.'}</p>
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; padding: 6px 10px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--glass-border);">
+                                    <span style="font-weight: 600; color: var(--text-primary);">Type</span>
+                                    <span style="font-weight: 700; color: var(--accent-color); font-size: 0.85rem;">${item.type || 'Theory'}</span>
                                 </div>
                             </div>
                             <div style="padding: 12px; background: var(--bg-secondary); border-top: 1px solid var(--glass-border); text-align: center;">
@@ -239,9 +194,6 @@ export class SubjectList {
 
         (async () => {
             try {
-                this.faculty = await ApiService.getFaculty();
-                const ff = filterBar.querySelector('#facultyFilter');
-                if(ff) { ff.innerHTML = '<option value="">All Faculty Members</option>' + this.faculty.map(f => `<option value="${f._id}">${f.name}</option>`).join(''); ff.onchange = () => loadData(); }
                 const ss = filterBar.querySelector('#subjectSearch');
                 if(ss) ss.oninput = () => loadData();
                 loadData();

@@ -9,7 +9,7 @@ export class ThemeService {
 
     static init() {
         const mode = localStorage.getItem('theme-mode') || 'light';
-        const accent = localStorage.getItem('theme-accent') || 'INDIGO';
+        const accent = localStorage.getItem('theme-accent') || 'VIOLET'; // Default to Violet accent to match purple theme
         
         this.setMode(mode);
         this.setAccent(accent);

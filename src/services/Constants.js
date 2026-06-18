@@ -1,10 +1,10 @@
 export const ROLES = {
     ADMIN: 'admin',
-    TEACHER: 'teacher',
     STUDENT: 'student'
 };
 
 export const ROUTES = {
+    HOME: 'home',
     DASHBOARD: 'dashboard',
     PROFILE: 'my-profile',
 
@@ -15,11 +15,7 @@ export const ROUTES = {
     STUDENTS_BULK: 'students/bulk',
     STUDENTS_EDIT: 'students/edit/:id',
 
-    // Faculty
-    FACULTY_LIST: 'faculty',
-    FACULTY_ADD: 'faculty/add',
-    FACULTY_BULK: 'faculty/bulk',
-    FACULTY_EDIT: 'faculty/edit/:id',
+
 
     // Courses
     COURSES_LIST: 'courses',
@@ -31,8 +27,7 @@ export const ROUTES = {
     ATTENDANCE: 'attendance',
     ASSIGNMENTS: 'assignments',
     STUDY_MATERIALS: 'study-materials',
-    TIMETABLE: 'timetable',
-    TIMETABLE_BULK: 'timetable/bulk',
+
     SUBJECTS_LIST: 'subjects',
     SUBJECTS_BULK: 'subjects/bulk',
     SUBJECTS_ADD: 'subjects/add',
@@ -61,6 +56,8 @@ export const ROUTES = {
     EXAMS_ADD:    'exams/add',
     EXAMS_EDIT:   'exams/edit/:id',
     EXAMS_MARKS:  'exams/marks',
+    EXAMS_ADMIT_CARDS: 'exams/admit-cards',
+    EXAM_REGISTRATION: 'exam-registration',
     RESULTS:      'results',
     ALUMNI:       'alumni',
 

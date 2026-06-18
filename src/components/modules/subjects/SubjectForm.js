@@ -52,15 +52,20 @@ export class SubjectForm {
                     <select name="type" class="glass-button" style="width: 100%; text-align: left; background: rgba(0,0,0,0.1); color: var(--text-primary);" required>
                         <option value="Theory">Theory</option>
                         <option value="Practical">Practical</option>
-                        <option value="Lab">Lab</option>
-                        <option value="Project">Project</option>
                     </select>
                 </div>
 
                 <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.85rem; color: var(--text-secondary);">Assign Faculty (Optional)</label>
-                    <select name="faculty" id="facultySelect" class="glass-button" style="width: 100%; text-align: left; background: rgba(0,0,0,0.1); color: var(--text-primary);">
-                        <option value="">-- Unassigned --</option>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.85rem; color: var(--text-secondary);">Course Program</label>
+                    <select name="course" id="courseSelect" class="glass-button" style="width: 100%; text-align: left; background: rgba(0,0,0,0.1); color: var(--text-primary);" required>
+                        <option value="">Select a Course...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.85rem; color: var(--text-secondary);">Semester</label>
+                    <select name="semester" id="semesterSelect" class="glass-button" style="width: 100%; text-align: left; background: rgba(0,0,0,0.1); color: var(--text-primary);" required disabled>
+                        <option value="">Select a Course First...</option>
                     </select>
                 </div>
 
@@ -78,20 +83,39 @@ export class SubjectForm {
 
         /** @type {HTMLButtonElement} */
         const submitBtn = form.querySelector('#submitBtn');
+        const courseSelect = form.querySelector('#courseSelect');
+        const semesterSelect = form.querySelector('#semesterSelect');
+
+        courseSelect.addEventListener('change', (e) => {
+            const courseName = e.target.value;
+            const course = this.courses.find(c => c.name === courseName);
+            semesterSelect.innerHTML = '<option value="">Select Semester...</option>';
+            if (course) {
+                semesterSelect.disabled = false;
+                const totalSemesters = course.duration * 2;
+                for (let i = 1; i <= totalSemesters; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = `Semester ${i} (Year ${Math.ceil(i/2)})`;
+                    semesterSelect.appendChild(opt);
+                }
+            } else {
+                semesterSelect.disabled = true;
+                semesterSelect.innerHTML = '<option value="">Select a Course First...</option>';
+            }
+        });
 
         const initForm = async () => {
             try {
-                // Fetch and populate faculty list
-                const facultyList = await ApiService.getFaculty();
-                const facultySelect = form.querySelector('#facultySelect');
-                if (facultyList && facultyList.length > 0) {
-                    facultyList.forEach(f => {
-                        const option = document.createElement('option');
-                        option.value = f._id;
-                        option.textContent = f.name;
-                        facultySelect.appendChild(option);
-                    });
-                }
+                this.courses = await ApiService.getCourses();
+                
+                // Populate courses
+                this.courses.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.name;
+                    opt.textContent = `${c.name} (${c.duration} Years)`;
+                    courseSelect.appendChild(opt);
+                });
 
                 if (this.isEdit) {
                     const subjects = await ApiService.getSubjects();
@@ -103,9 +127,10 @@ export class SubjectForm {
                         /** @type {HTMLSelectElement} */ (form.querySelector('select[name="type"]')).value = this.subjectData.type;
                         /** @type {HTMLTextAreaElement} */ (form.querySelector('textarea[name="description"]')).value = this.subjectData.description || '';
                         
-                        if (this.subjectData.faculty) {
-                            const facultyId = typeof this.subjectData.faculty === 'object' ? this.subjectData.faculty._id : this.subjectData.faculty;
-                            /** @type {HTMLSelectElement} */ (form.querySelector('select[name="faculty"]')).value = facultyId || '';
+                        if (this.subjectData.course) {
+                            courseSelect.value = this.subjectData.course;
+                            courseSelect.dispatchEvent(new Event('change'));
+                            semesterSelect.value = this.subjectData.semester || '';
                         }
                     } else {
                         Toast.error('Subject not found');
@@ -138,6 +163,11 @@ export class SubjectForm {
                 isValid = false;
             }
 
+            if (!data.course || !data.semester) {
+                Toast.error('Please select a valid Course and Semester.');
+                isValid = false;
+            }
+
             if (!isValid) return;
 
             submitBtn.textContent = this.isEdit ? 'Saving...' : 'Enrolling...';
@@ -145,13 +175,10 @@ export class SubjectForm {
 
             try {
                 const payload = {
-                    ...data
+                    ...data,
+                    semester: parseInt(data.semester),
+                    year: Math.ceil(parseInt(data.semester) / 2)
                 };
-                
-                // Don't send empty string for faculty (ObjectId casting error)
-                if (!payload.faculty) {
-                    delete payload.faculty;
-                }
 
                 if (this.isEdit) {
                     await ApiService.updateSubject(this.subjectId, payload);

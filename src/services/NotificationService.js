@@ -41,8 +41,8 @@ export class NotificationService {
                 icon:     '📢',
             }));
 
-            // 2. Low attendance alerts (admin/teacher sees all; student sees own)
-            if (user.role === 'admin' || user.role === 'teacher') {
+            // 2. Low attendance alerts (admin sees all; student sees own)
+            if (user.role === 'admin') {
                 const summary = await ApiService.getAnalyticsSummary().catch(() => null);
                 if (summary && summary.lowAttCount > 0) {
                     items.push({
@@ -74,8 +74,8 @@ export class NotificationService {
                 }
             }
 
-            // 3. Pending assignments (teacher: ungraded; student: pending)
-            if (user.role === 'teacher') {
+            // 3. Pending assignments (admin: ungraded; student: pending)
+            if (user.role === 'admin') {
                 const assignments = await ApiService.getAssignments().catch(() => []);
                 const ungraded = assignments.filter(a => a.submissions?.some(s => !s.grade));
                 if (ungraded.length > 0) {

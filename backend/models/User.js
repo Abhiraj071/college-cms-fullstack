@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['admin', 'teacher', 'student', 'parent'],
+        enum: ['admin', 'student', 'parent'],
         default: 'student'
     },
     name: {
@@ -28,7 +28,6 @@ const userSchema = new mongoose.Schema({
         sparse: true   // allows multiple docs with no/null email without violating unique
     },
     department: String,
-    designation: String, // For Faculty
     rollNo: String,      // For Students
     semester: Number,    // For Students
     phone: String,

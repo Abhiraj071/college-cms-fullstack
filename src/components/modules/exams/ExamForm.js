@@ -173,41 +173,14 @@ export class ExamForm {
             nextBtn.disabled = true;
 
             try {
-                // Subjects are not linked to courses in DB — fetch all subjects
-                // then use timetables to find which subjects belong to this course
-                const [allSubjects, allTimetables] = await Promise.all([
-                    ApiService.getSubjects(),
-                    ApiService.getTimetables()
-                ]);
+                // Fetch all subjects directly
+                const allSubjects = await ApiService.getSubjects();
 
-                // Find all subject names used in any timetable for this course
                 const selectedCourseRaw = data.course || '';
                 const selectedCourseLower = selectedCourseRaw.trim().toLowerCase();
-                
-                const courseTimetables = allTimetables.filter(t => t.course && t.course.trim().toLowerCase() === selectedCourseLower);
-                
-                const subjectNamesInCourse = new Set();
-                const subjectDetailsFromTimetable = {}; // { subjectName: { year, semester } }
 
-                courseTimetables.forEach(t => {
-                    if (t.grid) {
-                        Object.values(t.grid).forEach(slot => {
-                            if (slot.subject) {
-                                subjectNamesInCourse.add(slot.subject);
-                                subjectDetailsFromTimetable[slot.subject] = {
-                                    year: t.year || null,
-                                    semester: t.semester || null
-                                };
-                            }
-                        });
-                    }
-                });
-
-                // 1. Current Subjects: Match subjects by name to those found in any course timetable
-                let matched = allSubjects.filter(s => {
-                    const sName = (s.name || '').trim().toLowerCase();
-                    return Array.from(subjectNamesInCourse).some(name => name.trim().toLowerCase() === sName);
-                });
+                // 1. Current Subjects: Match subjects by course directly
+                let matched = allSubjects.filter(s => s.course && s.course.trim().toLowerCase() === selectedCourseLower);
 
                 // 2. Supplementary Subjects: Include subjects that students in this course have failed
                 try {
@@ -275,22 +248,10 @@ export class ExamForm {
                     matched = [...matched, ...backlogSubjects];
                 } catch (e) { console.error('Failed to fetch backlog subjects', e); }
 
-                // Fallback: If no timetables or backlogs found, show all subjects for this course
-                if (matched.length === 0) {
-                    matched = allSubjects.filter(s => s.course && s.course.trim().toLowerCase() === selectedCourseLower);
-                }
-                
                 // Final fallback: show all subjects if still empty
                 if (matched.length === 0) {
                     matched = allSubjects;
                 }
-
-                // Attach year/semester info
-                matched = matched.map(s => ({
-                    ...s,
-                    year: subjectDetailsFromTimetable[s.name]?.year || s.year || null,
-                    semester: subjectDetailsFromTimetable[s.name]?.semester || s.semester || null
-                }));
 
                 // Sort by year then name
                 matched.sort((a, b) => (a.year || 99) - (b.year || 99) || a.name.localeCompare(b.name));

@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const systemController = require('../controllers/systemController');
-// Note: protect + authorize('admin') is already applied in server.js for /api/system
+const { protect, authorize } = require('../middleware/authMiddleware');
 
-router.get('/export', systemController.exportBackup);
-router.post('/import', systemController.importBackup);
-router.get('/stats', systemController.getSystemStats);
-router.post('/reset', systemController.factoryReset);
+router.get('/export', protect, authorize('admin'), systemController.exportBackup);
+router.post('/import', protect, authorize('admin'), systemController.importBackup);
+router.get('/stats', protect, authorize('admin'), systemController.getSystemStats);
+router.post('/reset', protect, authorize('admin'), systemController.factoryReset);
 
 // Settings
 router.get('/settings', systemController.getSettings);
-router.post('/settings', systemController.updateSetting);
+router.post('/settings', protect, authorize('admin'), systemController.updateSetting);
 
 module.exports = router;

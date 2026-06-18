@@ -40,9 +40,6 @@ export class Profile {
             if (user.role === 'student') {
                 const students = await ApiService.getStudents();
                 extraInfo = students.find(s => (s.userId?._id || s.userId) == uid);
-            } else if (user.role === 'teacher') {
-                const faculty = await ApiService.getFaculty();
-                extraInfo = faculty.find(f => (f.userId?._id || f.userId) == uid);
             }
         } catch (err) { console.error(err); }
 
@@ -104,22 +101,15 @@ export class Profile {
         formPanel.style.padding = '3rem';
         
         let academic = '';
-        if (extraInfo) {
+        if (extraInfo && user.role === 'student') {
             academic = `
                 <div style="margin-top: 2.5rem; padding-top: 2rem; border-top: 1px dashed var(--glass-border);">
                     <h4 style="font-size: 0.75rem; font-weight: 800; color: var(--accent-color); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem;">Academic Verification</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                        ${user.role === 'student' ? `
-                            <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Program</label><div style="font-weight:700; margin-top:4px;">${extraInfo.course || '---'}</div></div>
-                            <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Registration</label><div style="font-weight:700; margin-top:4px;">${extraInfo.rollNo || '---'}</div></div>
-                            <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Semester</label><div style="font-weight:700; margin-top:4px;">SEM ${extraInfo.semester || '---'}</div></div>
-                            <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Origin</label><div style="font-weight:700; margin-top:4px;">${extraInfo.address || 'Internship Host'}</div></div>
-                        ` : `
-                            <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Faculty Dept.</label><div style="font-weight:700; margin-top:4px;">${extraInfo.department || 'General'}</div></div>
-                            <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Rank</label><div style="font-weight:700; margin-top:4px;">${extraInfo.designation || 'Lecturer'}</div></div>
-                            <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Qualifications</label><div style="font-weight:700; margin-top:4px;">${extraInfo.qualification || '---'}</div></div>
-                            <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Contact</label><div style="font-weight:700; margin-top:4px;">${extraInfo.phone || '---'}</div></div>
-                        `}
+                        <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Program</label><div style="font-weight:700; margin-top:4px;">${extraInfo.course || '---'}</div></div>
+                        <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Registration</label><div style="font-weight:700; margin-top:4px;">${extraInfo.rollNo || '---'}</div></div>
+                        <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Semester</label><div style="font-weight:700; margin-top:4px;">SEM ${extraInfo.semester || '---'}</div></div>
+                        <div><label style="font-size:0.65rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Origin</label><div style="font-weight:700; margin-top:4px;">${extraInfo.address || 'Internship Host'}</div></div>
                     </div>
                 </div>
             `;

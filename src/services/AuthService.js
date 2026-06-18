@@ -19,7 +19,6 @@ export class AuthService {
                     role:       data.user.role,
                     email:      data.user.email,
                     department: data.user.department,
-                    facultyId:  data.user.facultyId,
                 }));
                 return true;
             }

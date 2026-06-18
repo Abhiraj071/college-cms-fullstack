@@ -1,5 +1,5 @@
-import { Sidebar } from './Sidebar.js';
 import { Navbar } from './Navbar.js';
+import { AIAssistant } from './AIAssistant.js';
 
 export class Layout {
     constructor(user, logoutCallback) {
@@ -11,17 +11,13 @@ export class Layout {
         const layout = document.createElement('div');
         layout.className = 'main-layout';
 
-        // Sidebar
-        const sidebar = new Sidebar(this.user);
-        layout.appendChild(sidebar.render());
+        // Top Navbar
+        const navbar = new Navbar(routeTitle, this.user, this.logoutCallback);
+        layout.appendChild(navbar.render());
 
         // Main Content Area
         const main = document.createElement('div');
         main.className = 'main-content';
-
-        // Top Navbar
-        const navbar = new Navbar(routeTitle, this.logoutCallback);
-        main.appendChild(navbar.render());
 
         // Page Content placeholder
         const contentContainer = document.createElement('div');
@@ -30,6 +26,10 @@ export class Layout {
 
         main.appendChild(contentContainer);
         layout.appendChild(main);
+
+        // Floating AI Assistant
+        const assistant = new AIAssistant();
+        layout.appendChild(assistant.render());
 
         return {
             element: layout,

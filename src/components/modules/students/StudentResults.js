@@ -75,7 +75,7 @@ export class StudentResults {
                             <div class="glass-panel" style="padding:4rem; text-align:center; color:var(--text-secondary);">
                                 <div style="font-size:3rem; margin-bottom:1.5rem; opacity:0.3;">📊</div>
                                 <h3 style="opacity:0.7;">No Results Yet</h3>
-                                <p>Your results haven't been uploaded by faculty yet. Check back after your exams.</p>
+                                <p>Your results haven't been uploaded by administrators yet. Check back after your exams.</p>
                             </div>`;
                         return;
                     }
