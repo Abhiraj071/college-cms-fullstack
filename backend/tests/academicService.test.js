@@ -13,6 +13,9 @@ jest.mock('../models/Alumni', () => ({
 jest.mock('../models/Mark', () => ({
     find: jest.fn().mockResolvedValue([])
 }));
+jest.mock('../models/Setting', () => ({
+    findOne: jest.fn().mockResolvedValue({ value: { passPercentage: 40 } })
+}));
 
 describe('Academic Service - Promotion Logic', () => {
     it('should run promotion process without crashing (mocked)', async () => {
