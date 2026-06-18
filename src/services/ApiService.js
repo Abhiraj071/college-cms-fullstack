@@ -410,40 +410,7 @@ export class ApiService {
         });
     }
 
-    // ── Exams ─────────────────────────────────────────────────────────────────
-    static async getExams() {
-        return await this.request('/exams');
-    }
-    static async addExam(data) {
-        return await this.request('/exams', { method: 'POST', body: JSON.stringify(data) });
-    }
-    static async updateExam(id, data) {
-        return await this.request(`/exams/${id}`, { method: 'PUT', body: JSON.stringify(data) });
-    }
-    static async deleteExam(id) {
-        return await this.request(`/exams/${id}`, { method: 'DELETE' });
-    }
-    static async getMarksByExam(examId) {
-        return await this.request(`/exams/${examId}/marks`);
-    }
-    static async getStudentMarks(studentId) {
-        return await this.request(`/exams/marks/student/${studentId}`);
-    }
-    static async getStudentResultSummary(studentId) {
-        return await this.request(`/exams/results/student/${studentId}`);
-    }
-    static async updateMarks(data) {
-        return await this.request('/exams/marks', { method: 'POST', body: JSON.stringify(data) });
-    }
-    static async bulkUpdateMarks(marks) {
-        return await this.request('/exams/marks/bulk', { method: 'POST', body: JSON.stringify({ marks }) });
-    }
-    static async getSemesterWiseResults(studentId) {
-        return await this.request(`/exams/results/semester-wise/${studentId}`);
-    }
-    static async getSupplementarySubjects(course, semester) {
-        return await this.request(`/exams/supplementary-subjects?course=${encodeURIComponent(course)}&semester=${semester}`);
-    }
+
 
     // ── Exam Applications ─────────────────────────────────────────────────────
     static async getEligibleExams() {
@@ -501,8 +468,6 @@ export class ApiService {
         });
     }
 
-    static async getExamDashboardStats() {
-        return await this.request('/exams/stats/dashboard');
-    }
+
 
 }

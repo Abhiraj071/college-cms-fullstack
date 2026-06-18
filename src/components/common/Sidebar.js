@@ -114,6 +114,7 @@ export class Sidebar {
 
         if (role === ROLES.ADMIN) {
             return [
+<<<<<<< HEAD
                 overview,
                 {
                     title: 'Management',

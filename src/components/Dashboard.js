@@ -537,6 +537,7 @@ export class Dashboard {
         });
     }
 
+<<<<<<< HEAD
     // ─── STUDENT DASHBOARD HOME ───
 
     buildStudentHome(container, user) {
@@ -1430,4 +1431,7 @@ export class Dashboard {
             console.warn('Chart.js library failed to load.');
         }
     }
+=======
+
+>>>>>>> 66490d06e6e23eccc7b471a9002041cc9a9e2db4
 }

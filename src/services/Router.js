@@ -90,6 +90,7 @@ export class Router {
             [ROUTES.EXAM_REGISTRATION]: { roles: [ROLES.STUDENT], component: ExamRegistration },
             [ROUTES.RESULTS]:      { roles: [ROLES.STUDENT],  component: StudentResults },
 
+            [ROUTES.ALUMNI]:       { roles: [ROLES.ADMIN],    component: AlumniList },
         };
     }
 
@@ -169,18 +170,7 @@ export class Router {
             };
         }
 
-        const examEditPrefix = ROUTES.EXAMS_EDIT.split('/:')[0];
-        if (path.startsWith(examEditPrefix + '/')) {
-            return {
-                path,
-                params,
-                config: {
-                    roles: [ROLES.ADMIN],
-                    component: ExamForm,
-                    dynamicId: path.split('/').pop()
-                }
-            };
-        }
+
 
         return {
             path,
