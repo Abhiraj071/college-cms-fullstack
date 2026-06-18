@@ -14,7 +14,8 @@ export class AttendanceView {
         const localDateString = new Date(localDate.getTime() - (offset * 60 * 1000)).toISOString().split('T')[0];
         this.selectedDate = this.params.date || localDateString;
         this.sessionDetails = null; // { course, year, semester, subject }
-        this.activeTab = 'mark'; // mark, defaulters, history
+        const user = auth.getUser();
+        this.activeTab = (user && user.role === 'student') ? 'my-attendance' : 'mark';
         this.assignedClasses = [];
     }
 
@@ -121,6 +122,19 @@ export class AttendanceView {
 
     renderTab(container) {
         container.innerHTML = '';
+        const user = auth.getUser();
+        
+        // Ensure student cannot access teacher/admin tabs and vice versa
+        if (user && user.role === 'student') {
+            if (this.activeTab !== 'my-attendance' && this.activeTab !== 'scan-attendance') {
+                this.activeTab = 'my-attendance';
+            }
+        } else {
+            if (this.activeTab === 'my-attendance' || this.activeTab === 'scan-attendance') {
+                this.activeTab = 'mark';
+            }
+        }
+
         if (this.activeTab === 'mark') {
             if (this.selectedCourse) {
                 this.renderAttendanceForm(container);
@@ -132,7 +146,6 @@ export class AttendanceView {
         } else if (this.activeTab === 'scan-attendance') {
             this.renderScanAttendanceTab(container);
         } else if (this.activeTab === 'my-attendance') {
-            const user = auth.getUser();
             this.renderStudentView(container, user);
         } else {
             this.renderHistoryTab(container);

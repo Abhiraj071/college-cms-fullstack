@@ -42,8 +42,6 @@ export class StorageService {
         localStorage.setItem(STORAGE_KEYS.NOTICES, JSON.stringify(notices));
         localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
         localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify([]));
-        localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify([]));
-        localStorage.setItem(STORAGE_KEYS.GRADES, JSON.stringify([]));
     }
 
     getData(collection) {

@@ -89,11 +89,9 @@ export class Dashboard {
 
         if (user.role === 'teacher') {
             leftSide.appendChild(this.renderTodayTimetablePanel(user));
-            leftSide.appendChild(this.renderExamsTodayWidget(user));
             leftSide.appendChild(this.renderTeacherPendingTasks(user));
         } else if (user.role === 'student') {
             leftSide.appendChild(this.renderTodayTimetablePanel(user));
-            leftSide.appendChild(this.renderExamsTodayWidget(user));
         } else {
             leftSide.appendChild(this.renderAdminQuickActions());
             leftSide.appendChild(this.renderSystemOverview());
@@ -719,48 +717,5 @@ export class Dashboard {
         }, 500);
     }
 
-    renderExamsTodayWidget(user) {
-        const div = document.createElement('div');
-        div.className = 'glass-panel';
-        div.style.padding = '1.5rem';
-        div.style.borderTop = '4px solid #10b981';
-        div.style.marginBottom = '1.5rem';
-        div.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">📝 Exams Today</h3>
-                <a href="#exams/dashboard" style="font-size: 0.8rem; color: var(--accent-color); text-decoration: none; font-weight: 700;">Dashboard →</a>
-            </div>
-            <div id="dashboard-exams-list">
-                <p style="color: var(--text-secondary); font-size: 0.85rem;">Checking schedule...</p>
-            </div>
-        `;
 
-        this.updateExamsToday(div.querySelector('#dashboard-exams-list'), user);
-        return div;
-    }
-
-    async updateExamsToday(container, user) {
-        try {
-            const { ApiService } = await import('../services/ApiService.js');
-            const stats = await ApiService.getExamDashboardStats();
-            
-            if (!stats.todaySchedule || stats.todaySchedule.length === 0) {
-                container.innerHTML = `
-                    <div style="padding: 1rem; text-align: center; background: rgba(16, 185, 129, 0.05); border-radius: 8px;">
-                        <p style="color: #10b981; margin: 0; font-size: 0.85rem; font-weight: 600;">No exams scheduled for today.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = stats.todaySchedule.map(exam => `
-                <div style="padding: 0.75rem; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--glass-border); margin-bottom: 0.5rem;">
-                    <div style="font-weight: 700; font-size: 0.9rem;">${exam.subject}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-secondary);">${exam.time || 'TBA'} • ${exam.venue || 'Room TBA'}</div>
-                </div>
-            `).join('');
-        } catch (e) {
-            container.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.8rem;">Unable to load exams.</p>';
-        }
-    }
 }

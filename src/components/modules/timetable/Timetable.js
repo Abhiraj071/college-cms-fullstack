@@ -9,7 +9,7 @@ export class Timetable {
         this.selectedCourse = '';
         this.selectedYear = '';
         this.selectedSemester = '';
-        this.days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        this.days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         this.timeSlots = [
             '09:00 - 10:30',
             '10:30 - 12:00',
@@ -235,14 +235,14 @@ export class Timetable {
             this.faculty = faculty;
             const doc = Array.isArray(data) ? data[0] : data;
             if (doc) {
-                this.days = doc.days || ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                this.days = doc.days || ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
                 this.timeSlots = doc.timeSlots || [
                     '09:00 - 10:30', '10:30 - 12:00', '12:00 - 01:00', 
                     '01:00 - 01:30', '01:30 - 03:00', '03:00 - 04:30'
                 ];
                 this.gridData = doc.grid || {};
             } else {
-                this.days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                this.days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
                 this.timeSlots = [
                     '09:00 - 10:30', '10:30 - 12:00', '12:00 - 01:00', 
                     '01:00 - 01:30', '01:30 - 03:00', '03:00 - 04:30'
@@ -261,22 +261,24 @@ export class Timetable {
         card.style.overflowX = 'auto';
         card.style.padding = '0';
         card.style.borderRadius = '16px';
+        card.style.boxShadow = 'var(--glass-shadow)';
+        card.style.border = '1px solid var(--glass-border)';
 
         const table = document.createElement('table');
         table.style.width = '100%';
-        table.style.borderCollapse = 'collapse';
-        table.style.minWidth = '1200px';
+        table.style.borderCollapse = 'separate';
+        table.style.borderSpacing = '0';
+        table.style.tableLayout = 'fixed';
 
         const thead = document.createElement('thead');
-        let headHTML = `<tr style="background: var(--bg-primary); border-bottom: 2px solid var(--glass-border);">
-            <th style="padding: 20px; width: 140px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 1px; font-weight: 800; text-align: center; position: sticky; left: 0; background: var(--bg-primary); z-index: 2; border-right: 2px solid var(--glass-border);">📅 DAY</th>`;
+        let headHTML = `<tr>
+            <th style="padding: 0.75rem 0.5rem; width: 80px; font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; font-weight: 800; text-align: center; position: sticky; left: 0; background: var(--bg-primary); z-index: 2; border-right: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">Day / Time</th>`;
 
         this.timeSlots.forEach((slot, idx) => {
-            headHTML += `<th style="padding: 20px; border-left: 1px solid var(--glass-border); text-align: center; min-width: 160px;">
-                <div style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Time Slot</div>
-                <div style="font-size: 0.8rem; color: var(--accent-color); font-weight: 700; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                    ${slot}
-                    ${isAdmin ? `<span class="del-col-btn" data-idx="${idx}" style="cursor:pointer; color:var(--danger); font-size: 1.1rem; padding: 0 4px;">×</span>` : ''}
+            headHTML += `<th style="padding: 0.75rem 0.25rem; border-left: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); text-align: center; background: var(--bg-primary); position: relative;">
+                <div style="font-size: 0.75rem; color: var(--accent-color); font-weight: 700; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <i class="fas fa-clock" style="font-size: 0.65rem; opacity: 0.7;"></i> ${slot}
+                    ${isAdmin ? `<span class="del-col-btn" data-idx="${idx}" style="cursor:pointer; color:var(--danger); font-size: 1rem; padding: 2px; border-radius: 4px; transition: 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.background='transparent'">×</span>` : ''}
                 </div>
             </th>`;
         });
@@ -287,10 +289,13 @@ export class Timetable {
         const tbody = document.createElement('tbody');
         this.days.forEach((day, dayIdx) => {
             const tr = document.createElement('tr');
-            tr.style.borderBottom = '1px solid var(--glass-border)';
-            let rowHTML = `<td style="padding: 20px; background: var(--bg-primary); font-weight: 800; color: var(--text-primary); text-align: center; border-right: 2px solid var(--glass-border); position: sticky; left: 0; z-index: 1;">
-                <div style="font-size: 0.9rem; letter-spacing: -0.5px; color: var(--text-primary);">${day}</div>
-                ${isAdmin ? `<span class="del-row-btn" data-idx="${dayIdx}" style="cursor:pointer; color:var(--danger); display:block; margin-top: 4px; font-size: 0.8rem; font-weight: 400;">(remove)</span>` : ''}
+            tr.style.transition = 'background 0.2s ease';
+            tr.onmouseover = () => { tr.style.background = 'rgba(255, 255, 255, 0.02)'; };
+            tr.onmouseout = () => { tr.style.background = 'transparent'; };
+
+            let rowHTML = `<td style="padding: 0.75rem 0.5rem; background: var(--bg-primary); font-weight: 800; color: var(--text-primary); text-align: center; border-right: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); position: sticky; left: 0; z-index: 1;">
+                <div style="font-size: 0.8rem; letter-spacing: -0.2px; color: var(--text-primary);">${day}</div>
+                ${isAdmin ? `<span class="del-row-btn" data-idx="${dayIdx}" style="cursor:pointer; color:var(--danger); display:inline-block; margin-top: 4px; font-size: 0.65rem; font-weight: 600; padding: 2px 4px; border-radius: 4px; background: rgba(239, 68, 68, 0.1); transition: 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'">Remove</span>` : ''}
             </td>`;
 
             this.timeSlots.forEach(slot => {
@@ -299,28 +304,36 @@ export class Timetable {
                 const content = cellData.subject || '';
                 const isLunch = content === 'Lunch Break';
 
-                rowHTML += `<td style="padding: 8px; border-left: 1px solid var(--glass-border);">
+                // Fixed the td and inner div to guarantee consistent heights
+                rowHTML += `<td style="padding: 4px; border-left: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); vertical-align: top; height: 1px;">
                     <div class="timetable-slot ${content ? 'active' : ''} ${isAdmin ? 'editable' : ''}" data-key="${key}" style="
-                        height: 75px; 
+                        height: 100%;
+                        min-height: 80px;
                         width: 100%;
-                        border-radius: 12px;
-                        ${isLunch ? 'background: var(--bg-primary);' : (content ? 'background: linear-gradient(135deg, var(--bg-secondary), rgba(99, 102, 241, 0.05)); border-left: 4px solid var(--accent-color); shadow: var(--glass-shadow);' : 'border: 1px dashed var(--glass-border);')}
+                        border-radius: 6px;
+                        ${isLunch 
+                            ? 'background: rgba(156, 163, 175, 0.1); border: 1px dashed rgba(156, 163, 175, 0.3);' 
+                            : (content 
+                                ? 'background: linear-gradient(145deg, var(--bg-secondary), rgba(99, 102, 241, 0.08)); border: 1px solid var(--glass-border); border-left: 3px solid var(--accent-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05);' 
+                                : 'border: 1px dashed var(--glass-border); background: transparent;')}
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
                         text-align: center;
-                        padding: 8px;
-                        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                        padding: 6px;
+                        transition: all 0.2s ease;
                         cursor: pointer;
                         overflow: hidden;
-                    ">
-                         ${isLunch ? `<div style="font-size: 0.65rem; font-weight: 800; color: var(--text-secondary); letter-spacing: 1px;">🍴 LUNCH</div>` : 
+                        position: relative;
+                        box-sizing: border-box;
+                    " onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='${content && !isLunch ? '0 2px 8px rgba(0,0,0,0.05)' : 'none'}';">
+                         ${isLunch ? `<div style="font-size: 0.65rem; font-weight: 800; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase;">🍴 Lunch</div>` : 
                                     (content ? `
-                                        <div style="font-weight: 800; font-size: 0.85rem; color: var(--text-primary); line-height: 1.2; margin-bottom: 2px;">${content}</div>
-                                        <div style="font-size: 0.7rem; font-weight: 700; color: var(--accent-color); margin-bottom: 4px;">${cellData.teacher || ''}</div>
-                                        <div style="font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); opacity: 0.8;">📍 ${cellData.room || 'Room TBA'}</div>
-                                    ` : (isAdmin ? '<div style="font-size: 1.25rem; opacity: 0.2;">+</div>' : ''))}
+                                        <div style="font-weight: 800; font-size: 0.75rem; color: var(--text-primary); line-height: 1.1; margin-bottom: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; width: 100%;">${content}</div>
+                                        <div style="font-size: 0.65rem; font-weight: 600; color: var(--accent-color); margin-bottom: 2px; display: flex; align-items: center; justify-content: center; gap: 3px; width: 100%;"><i class="fas fa-user-tie" style="font-size: 0.6rem;"></i> <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%;">${cellData.teacher || 'TBA'}</span></div>
+                                        <div style="font-size: 0.6rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-primary); padding: 1px 4px; border-radius: 12px; border: 1px solid var(--glass-border); max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><i class="fas fa-map-marker-alt" style="font-size: 0.5rem;"></i> ${cellData.room || 'TBA'}</div>
+                                    ` : (isAdmin ? '<div style="font-size: 1rem; color: var(--text-secondary); opacity: 0.3; transition: 0.2s;" onmouseover="this.style.opacity=0.8; this.style.color=\'var(--accent-color)\'" onmouseout="this.style.opacity=0.3; this.style.color=\'var(--text-secondary)\'">+</div>' : ''))}
                     </div>
                 </td>`;
             });

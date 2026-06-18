@@ -46,7 +46,6 @@ app.use('/api/search',          protect, require('./routes/searchRoutes'));
 app.use('/api/upload',          protect, require('./routes/uploadRoutes'));
 app.use('/api/email',           protect, authorize('admin'), require('./routes/emailRoutes'));
 app.use('/api/system',          protect, authorize('admin'), require('./routes/systemRoutes'));
-app.use('/api/exams',           require('./routes/examRoutes'));
 app.use('/api/analytics',       protect, require('./routes/analyticsRoutes'));
 app.use('/api/activity-log',    protect, require('./routes/activityLogRoutes'));
 app.use('/api/alumni',          protect, require('./routes/alumniRoutes'));

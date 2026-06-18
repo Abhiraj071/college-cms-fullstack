@@ -54,14 +54,6 @@ export const ROUTES = {
     REPORTS: 'reports',
     SETTINGS: 'settings',
 
-    // Exams & Results
-    EXAMS_LIST:   'exams',
-    EXAMS_BULK:   'exams/bulk',
-    EXAMS_DASHBOARD: 'exams/dashboard',
-    EXAMS_ADD:    'exams/add',
-    EXAMS_EDIT:   'exams/edit/:id',
-    EXAMS_MARKS:  'exams/marks',
-    RESULTS:      'results',
     ALUMNI:       'alumni',
 
     // New Features

@@ -29,12 +29,7 @@ import { AssignmentList } from '../components/modules/assignments/AssignmentList
 import { StudyMaterialList } from '../components/modules/study-materials/StudyMaterialList.js';
 
 import { AcademicCalendar }   from '../components/modules/calendar/AcademicCalendar.js';
-import { ExamList }           from '../components/modules/exams/ExamList.js';
-import { ExamForm }           from '../components/modules/exams/ExamForm.js';
-import { MarkEntry }          from '../components/modules/exams/MarkEntry.js';
-import { ExamDashboard }      from '../components/modules/exams/ExamDashboard.js';
-import { StudentResults }     from '../components/modules/students/StudentResults.js';
-import { BulkExamForm }      from '../components/modules/exams/BulkExamForm.js';
+
 import { BulkSubjectForm }   from '../components/modules/subjects/BulkSubjectForm.js';
 import { BulkTimetableForm } from '../components/modules/timetable/BulkTimetableForm.js';
 import { AlumniList }         from '../components/modules/students/AlumniList.js';
@@ -97,13 +92,7 @@ export class Router {
             // ── New Feature Routes ──────────────────────────────────────────
             [ROUTES.CALENDAR]:     { roles: ALL,              component: AcademicCalendar },
 
-            // ── Exams & Results ─────────────────────────────────────────────
-            [ROUTES.EXAMS_LIST]:   { roles: ALL,              component: ExamList },
-            [ROUTES.EXAMS_BULK]:   { roles: [ROLES.ADMIN],    component: BulkExamForm },
-            [ROUTES.EXAMS_DASHBOARD]: { roles: ALL,           component: ExamDashboard },
-            [ROUTES.EXAMS_ADD]:    { roles: [ROLES.ADMIN],    component: ExamForm },
-            [ROUTES.EXAMS_MARKS]:  { roles: STAFF,            component: MarkEntry },
-            [ROUTES.RESULTS]:      { roles: [ROLES.STUDENT],  component: StudentResults },
+
             [ROUTES.ALUMNI]:       { roles: [ROLES.ADMIN],    component: AlumniList },
         };
     }
@@ -194,18 +183,7 @@ export class Router {
             };
         }
 
-        const examEditPrefix = ROUTES.EXAMS_EDIT.split('/:')[0];
-        if (path.startsWith(examEditPrefix + '/')) {
-            return {
-                path,
-                params,
-                config: {
-                    roles: [ROLES.ADMIN],
-                    component: ExamForm,
-                    dynamicId: path.split('/').pop()
-                }
-            };
-        }
+
 
         return {
             path,
